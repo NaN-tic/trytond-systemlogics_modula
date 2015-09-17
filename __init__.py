@@ -10,5 +10,6 @@ def register():
     Pool.register(
         SystemLogicsModula,
         ShipmentOut,
+        ShipmentInternal,
         Location,
         module='systemlogics_modula', type_='model')

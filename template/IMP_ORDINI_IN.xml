@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<SYSTORE_ORDINI xmlns:py="http://genshi.edgewall.org/">
+  <IMP_ORDINI>
+    <ORD_ORDINE>${shipment.code}</ORD_ORDINE>
+    <ORD_DES></ORD_DES>
+    <ORD_TIPOOP>${type_}</ORD_TIPOOP> <!-- P: Extracion / V: Deposito -->
+    <ORD_PRIOHOST>${datetime.datetime.now().strftime("%Y%m%d%H%M%s")[:16]}</ORD_PRIOHOST> <!-- fechaHora AAAAMMGGHHPPPPPP -->
+    <ORD_CLIENTE></ORD_CLIENTE>
+    <ORD_SPEDIZIONE></ORD_SPEDIZIONE>
+    <ORD_GEST_PKL></ORD_GEST_PKL>
+    <IMP_ORDINI_RIGHE py:for="move in shipment.moves">
+      <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
+      <RIG_ARTICOLO>${move.product.code or move.product.name}</RIG_ARTICOLO>
+      <RIG_SUB1/>
+      <RIG_SUB2/>
+      <RIG_STAMATE/>
+      <RIG_TIPOCONF/>
+      <RIG_HOSTINF>${move.id}</RIG_HOSTINF>
+      <RIG_QTAR>${int(move.quantity)}</RIG_QTAR>
+      <RIG_PRIO>0</RIG_PRIO>
+      <RIG_REQ_NOTE/>
+    </IMP_ORDINI_RIGHE>
+  </IMP_ORDINI>
+</SYSTORE_ORDINI>

@@ -1,6 +1,7 @@
 #This file is part systemlogics_modula module for Tryton.
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
+from trytond.pool import Pool
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
 from trytond.transaction import Transaction
@@ -58,11 +59,18 @@ class SystemLogicsModula(ModelSQL, ModelView):
         return True
 
     @classmethod
-    def imp_ordini(self, shipments):
+    def imp_ordini(self, shipments, template='IMP_ORDINI_OUT', type_='P'):
+        Location = Pool().get('stock.location')
+
         shipments_ordini = []
         for shipment in shipments:
             if shipment.state != 'assigned':
                 continue
+            if not hasattr(shipment, 'warehouse'):
+                warehouse = Transaction().context.get('stock_warehouse')
+                if not warehouse:
+                    warehouse, = Location.search([('type', '=', 'warehouse')], limit=1)
+                shipment.warehouse = warehouse
             shipments_ordini.append(shipment)
 
         if not shipments_ordini:
@@ -90,31 +98,31 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 return
     
             ordini = getattr(self, 'imp_ordini_%s' % systemlogic.dbhost)
-            ordini(systemlogic, shipments)
+            ordini(systemlogic, shipments, template, type_)
 
     @classmethod
-    def imp_ordini_odbc(self, systemlogic, shipments):
+    def imp_ordini_odbc(self, systemlogic, shipments, template):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI ODBC not supported')
 
     @classmethod
-    def imp_ordini_ascii(self, systemlogic, shipments):
+    def imp_ordini_ascii(self, systemlogic, shipments, template):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI ASCII not supported')
 
     @classmethod
-    def imp_ordini_excel(self, systemlogic, shipments):
+    def imp_ordini_excel(self, systemlogic, shipments, template):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI EXCEL not supported')
 
     @classmethod
-    def imp_ordini_xml(self, systemlogic, shipments):
-        tmpl = loader.load('IMP_ORDINI.xml')
+    def imp_ordini_xml(self, systemlogic, shipments, template, type_):
+        tmpl = loader.load('%s.xml' % template)
 
         dbname = Transaction().cursor.dbname
 
         for shipment in shipments:
-            xml = tmpl.generate(shipment=shipment, datetime=datetime).render()
+            xml = tmpl.generate(shipment=shipment, type_=type_, datetime=datetime).render()
 
             with tempfile.NamedTemporaryFile(
                     dir=systemlogic.path,
