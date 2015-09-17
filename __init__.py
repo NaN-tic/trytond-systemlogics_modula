@@ -4,12 +4,14 @@
 from trytond.pool import Pool
 from .systemlogics import *
 from .location import *
+from .product import *
 from .stock import *
 
 def register():
     Pool.register(
         SystemLogicsModula,
+        Location,
+        ProductCode,
         ShipmentOut,
         ShipmentInternal,
-        Location,
         module='systemlogics_modula', type_='model')

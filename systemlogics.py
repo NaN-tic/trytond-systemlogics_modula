@@ -69,7 +69,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
             if not hasattr(shipment, 'warehouse'):
                 warehouse = Transaction().context.get('stock_warehouse')
                 if not warehouse:
-                    warehouse, = Location.search([('type', '=', 'warehouse')], limit=1)
+                    warehouse, = Location.search(
+                        [('type', '=', 'warehouse')], limit=1)
                 shipment.warehouse = warehouse
             shipments_ordini.append(shipment)
 
@@ -84,7 +85,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 ], limit=1)
             if not systemlogics:
                 logging.getLogger('systemlogics-modula').warning(
-                    'Configure a IMP_ORDINI related with "%s" warehouse.' % (warehouse.name))
+                    'Configure a IMP_ORDINI related with "%s" warehouse.' % (
+                        warehouse.name))
                 return
 
             systemlogic, = systemlogics
@@ -101,17 +103,17 @@ class SystemLogicsModula(ModelSQL, ModelView):
             ordini(systemlogic, shipments, template, type_)
 
     @classmethod
-    def imp_ordini_odbc(self, systemlogic, shipments, template):
+    def imp_ordini_odbc(self, systemlogic, shipments, template, type_):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI ODBC not supported')
 
     @classmethod
-    def imp_ordini_ascii(self, systemlogic, shipments, template):
+    def imp_ordini_ascii(self, systemlogic, shipments, template, type_):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI ASCII not supported')
 
     @classmethod
-    def imp_ordini_excel(self, systemlogic, shipments, template):
+    def imp_ordini_excel(self, systemlogic, shipments, template, type_):
         logging.getLogger('systemlogics-modula').error(
             'IMP_ORDINI EXCEL not supported')
 
@@ -122,11 +124,77 @@ class SystemLogicsModula(ModelSQL, ModelView):
         dbname = Transaction().cursor.dbname
 
         for shipment in shipments:
-            xml = tmpl.generate(shipment=shipment, type_=type_, datetime=datetime).render()
+            xml = tmpl.generate(
+                shipment=shipment, type_=type_, datetime=datetime).render()
 
             with tempfile.NamedTemporaryFile(
                     dir=systemlogic.path,
                     prefix='%s-%s-' % (dbname, shipment.code),
+                    suffix='.xml', delete=False) as temp:
+                temp.write(xml)
+            logging.getLogger('systemlogics-modula').info(
+                'Generated XML %s' % (temp.name))
+            temp.close()
+
+    @classmethod
+    def imp_articoli(self, products):
+        Location = Pool().get('stock.location')
+
+        warehouse = Transaction().context.get('stock_warehouse')
+        if not warehouse:
+            warehouse, = Location.search(
+                [('type', '=', 'warehouse')], limit=1)
+
+        systemlogics = self.search([
+            ('name', '=', 'IMP_ARTICOLI'),
+            ('warehouse', '=', warehouse),
+            ], limit=1)
+        if not systemlogics:
+            logging.getLogger('systemlogics-modula').warning(
+                'Configure a IMP_ARTICOLI related with "%s" warehouse.' % (
+                    warehouse.name))
+            return
+
+        systemlogic, = systemlogics
+
+        if not os.path.isdir(systemlogic.path):
+            logging.getLogger('systemlogics-modula').warning(
+                'Directory "%s" not exist (ID: %s)' % (
+                    systemlogic.path,
+                    systemlogic.id,
+                    ))
+            return
+    
+        articoli = getattr(self, 'imp_articoli_%s' % systemlogic.dbhost)
+        articoli(systemlogic, products)
+
+    @classmethod
+    def imp_articoli_odbc(self, products):
+        logging.getLogger('systemlogics-modula').error(
+            'IMP_ARTICOLI ODBC not supported')
+
+    @classmethod
+    def imp_articoli_ascii(self, products):
+        logging.getLogger('systemlogics-modula').error(
+            'IMP_ARTICOLI ASCII not supported')
+
+    @classmethod
+    def imp_articoli_excel(self, products):
+        logging.getLogger('systemlogics-modula').error(
+            'IMP_ARTICOLI EXCEL not supported')
+
+    @classmethod
+    def imp_articoli_xml(self, systemlogic, products):
+        tmpl = loader.load('IMP_ARTICOLI.xml')
+
+        dbname = Transaction().cursor.dbname
+
+        for product in products:
+            xml = tmpl.generate(product=product).render()
+
+            with tempfile.NamedTemporaryFile(
+                    dir=systemlogic.path,
+                    prefix='%s-%s-' % (dbname, product.code_ean13),
                     suffix='.xml', delete=False) as temp:
                 temp.write(xml)
             logging.getLogger('systemlogics-modula').info(

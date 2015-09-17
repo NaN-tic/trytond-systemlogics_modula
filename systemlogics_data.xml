@@ -11,5 +11,9 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="name">EXP_ORDINI</field>
             <field name="dbhost">xml</field>
         </record>
+        <record model="systemlogics.modula" id="systemlogics_modula_imp_articoli">
+            <field name="name">IMP_ARTICOLI</field>
+            <field name="dbhost">xml</field>
+        </record>
     </data>
 </tryton>

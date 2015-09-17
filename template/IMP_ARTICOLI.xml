@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<SYSTORE_ARTICOLI xmlns:py="http://genshi.edgewall.org/">
+  <IMP_ARTICOLI>
+    <ART_ARTICOLO>${product.code_ean13}</ART_ARTICOLO>
+     <ART_DES>${product.rec_name[:100]}</ART_DES>
+     <ART_UMI>${product.default_uom.symbol}</ART_UMI>
+     <ART_PMU></ART_PMU>
+     <ART_AREEABI></ART_AREEABI>
+     <ART_TIPOGESTART></ART_TIPOGESTART>
+     <ART_FIFOP></ART_FIFOP>
+     <ART_FIFOV></ART_FIFOV>
+     <ART_NOTE></ART_NOTE>
+     <ART_CLAMOV></ART_CLAMOV>
+  </IMP_ARTICOLI>
+</SYSTORE_ARTICOLI>
