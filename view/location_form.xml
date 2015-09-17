@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- This file is part systemlogics_modula module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='type']" position="after">
+        <label name="systemlogics_modula"/>
+        <field name="systemlogics_modula"/>
+    </xpath>
+</data>
