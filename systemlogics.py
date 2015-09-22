@@ -194,7 +194,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
             with tempfile.NamedTemporaryFile(
                     dir=systemlogic.path,
-                    prefix='%s-%s-' % (dbname, product.code_ean13),
+                    prefix='%s-%s-' % (dbname, product.code or product.id),
                     suffix='.xml', delete=False) as temp:
                 temp.write(xml)
             logging.getLogger('systemlogics-modula').info(

@@ -2,7 +2,7 @@
 <SYSTORE_ORDINI xmlns:py="http://genshi.edgewall.org/">
   <IMP_ORDINI>
     <ORD_ORDINE>${shipment.code}</ORD_ORDINE>
-    <ORD_DES>${shipment.reference[:50]}</ORD_DES>
+    <ORD_DES>${shipment.reference and shipment.reference[:50]}</ORD_DES>
     <ORD_TIPOOP>${type_}</ORD_TIPOOP> <!-- P: Extracion / V: Deposito -->
     <ORD_PRIOHOST>${datetime.datetime.now().strftime("%Y%m%d%H%M%s")[:16]}</ORD_PRIOHOST> <!-- fechaHora AAAAMMGGHHPPPPPP -->
     <ORD_CLIENTE>${shipment.customer.name[:50]}</ORD_CLIENTE>

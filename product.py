@@ -29,11 +29,11 @@ class Product:
         SystemLogicsModula = Pool().get('systemlogics.modula')
 
         super(Product, cls).write(*args)
-        print "product write"
+
         systemlogics_products = []
         actions = iter(args)
         for products, values in zip(actions, actions):
-            if 'code' in values and not values.get('codes'):
+            if values.get('code') and not values.get('codes'):
                 systemlogics_products = products
 
         if systemlogics_products:
