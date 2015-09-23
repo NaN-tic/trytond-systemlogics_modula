@@ -1,91 +1,131 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:stock.location,systemlogics:"
-msgid "SystemLogics"
-msgstr "SystemLogics"
+msgctxt "error:systemlogics.modula.articoli:"
+msgid "Export %s product/s (IMP ARTICOLI)"
+msgstr "Exportat %s producte/s (IMP ARTICOLI)"
 
-msgctxt "field:stock.shipment.out,systemlogics:"
-msgid "System Logics"
-msgstr "SystemLogics"
+msgctxt "field:stock.location,systemlogics_modula:"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
 
-msgctxt "field:systemlogics,active:"
+msgctxt "field:stock.shipment.internal,systemlogics_modula:"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
+msgctxt "field:stock.shipment.out,systemlogics_modula:"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
+msgctxt "field:systemlogics.modula,active:"
 msgid "Active"
-msgstr "Activa"
+msgstr "Actiu"
 
-msgctxt "field:systemlogics,create_date:"
+msgctxt "field:systemlogics.modula,create_date:"
 msgid "Create Date"
 msgstr "Data creació"
 
-msgctxt "field:systemlogics,create_uid:"
+msgctxt "field:systemlogics.modula,create_uid:"
 msgid "Create User"
 msgstr "Usuari creació"
 
-msgctxt "field:systemlogics,dbhost:"
+msgctxt "field:systemlogics.modula,dbhost:"
 msgid "DB Host"
 msgstr "DB Host"
 
-msgctxt "field:systemlogics,id:"
+msgctxt "field:systemlogics.modula,id:"
 msgid "ID"
 msgstr "ID"
 
-msgctxt "field:systemlogics,name:"
+msgctxt "field:systemlogics.modula,name:"
 msgid "Name"
 msgstr "Nom"
 
-msgctxt "field:systemlogics,path:"
+msgctxt "field:systemlogics.modula,path:"
 msgid "Path"
 msgstr "Ruta"
 
-msgctxt "field:systemlogics,rec_name:"
+msgctxt "field:systemlogics.modula,rec_name:"
 msgid "Name"
 msgstr "Nom"
 
-msgctxt "field:systemlogics,warehouse:"
+msgctxt "field:systemlogics.modula,warehouse:"
 msgid "Warehouse"
 msgstr "Magatzem"
 
-msgctxt "field:systemlogics,write_date:"
+msgctxt "field:systemlogics.modula,write_date:"
 msgid "Write Date"
-msgstr "Usuari creació"
+msgstr "Data modificació"
 
-msgctxt "field:systemlogics,write_uid:"
+msgctxt "field:systemlogics.modula,write_uid:"
 msgid "Write User"
 msgstr "Usuari modificació"
 
-msgctxt "help:stock.location,systemlogics:"
-msgid "System Logics location"
-msgstr "Ubicació SystemLogics"
+msgctxt "field:systemlogics.modula.articoli.result,id:"
+msgid "ID"
+msgstr "ID"
 
-msgctxt "help:systemlogics,warehouse:"
+msgctxt "field:systemlogics.modula.articoli.result,info:"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "help:stock.location,systemlogics_modula:"
+msgid "SystemLogics Modula location"
+msgstr "Ubicació SystemLogics Modula"
+
+msgctxt "help:systemlogics.modula,warehouse:"
 msgid "System Logics Warehouse"
-msgstr "Magatzem SystemLogics"
+msgstr "Magatzem SystemLogics Modula"
 
-msgctxt "model:ir.action,name:act_systemlogics_form"
+msgctxt "model:ir.action,name:act_systemlogics_modula_form"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
+msgctxt "model:ir.action,name:wizard_systemlogics_modula_articoli"
+msgid "Export Products Modula"
+msgstr "Exporta productes Modula"
+
+msgctxt "model:ir.ui.menu,name:"
 msgid "SystemLogics"
 msgstr "SystemLogics"
 
-msgctxt "model:ir.ui.menu,name:menu_systemlogics"
-msgid "SystemLogics"
-msgstr "SystemLogics"
+msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
 
-msgctxt "model:ir.ui.menu,name:menu_systemlogics_form"
-msgid "SystemLogics"
-msgstr "SystemLogics"
+msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_form"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
 
-msgctxt "model:res.group,name:group_systemlogics_admin"
-msgid "SystemLogics Administration"
-msgstr "Administrador SystemLogics"
+msgctxt "model:res.group,name:group_systemlogics_modula"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
 
-msgctxt "model:systemlogics,name:"
-msgid "SystemLogics"
-msgstr "SystemLogics"
+msgctxt "model:res.group,name:group_systemlogics_modula_admin"
+msgid "SystemLogics Modula Administration"
+msgstr "Administrador SystemLogics Modula"
 
-msgctxt "selection:systemlogics,dbhost:"
+msgctxt "model:systemlogics.modula,name:"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
+msgctxt "model:systemlogics.modula.articoli.result,name:"
+msgid "Systemlogics Modula Articoli Result"
+msgstr "Resultat SystemLogics Modula Articoli"
+
+msgctxt "selection:systemlogics.modula,dbhost:"
 msgid "XML"
 msgstr "XML"
 
-msgctxt "view:systemlogics:"
+msgctxt "view:systemlogics.modula.articoli.result:"
+msgid "Export Product XML Modula"
+msgstr "Exportar XML productes Modula"
+
+msgctxt "view:systemlogics.modula:"
 msgid "SystemLogics"
 msgstr "SystemLogics"
+
+msgctxt "wizard_button:systemlogics.modula.articoli,result,end:"
+msgid "Close"
+msgstr "Tanca"
