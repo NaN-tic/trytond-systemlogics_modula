@@ -5,11 +5,18 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
     <data>
         <!-- Groups -->
         <record model="res.group" id="group_systemlogics_modula_admin">
-            <field name="name">SystemLogics Administration</field>
+            <field name="name">SystemLogics Modula Administration</field>
         </record>
         <record model="res.user-res.group" id="user_admin_group_systemlogics_modula_admin">
             <field name="user" ref="res.user_admin"/>
             <field name="group" ref="group_systemlogics_modula_admin"/>
+        </record>
+        <record model="res.group" id="group_systemlogics_modula">
+            <field name="name">SystemLogics Modula</field>
+        </record>
+        <record model="res.user-res.group" id="user_group_systemlogics_modula">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
         <!-- Menu Top -->

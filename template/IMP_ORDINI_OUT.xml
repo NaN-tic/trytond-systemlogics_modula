@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <SYSTORE_ORDINI xmlns:py="http://genshi.edgewall.org/">
-  <IMP_ORDINI>
+  <IMP_ORDINI py:for="shipment in shipments">
     <ORD_ORDINE>${shipment.code}</ORD_ORDINE>
     <ORD_DES>${shipment.reference and shipment.reference[:50]}</ORD_DES>
     <ORD_TIPOOP>${type_}</ORD_TIPOOP> <!-- P: Extracion / V: Deposito -->

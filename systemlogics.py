@@ -123,18 +123,17 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         dbname = Transaction().cursor.dbname
 
-        for shipment in shipments:
-            xml = tmpl.generate(
-                shipment=shipment, type_=type_, datetime=datetime).render()
+        xml = tmpl.generate(
+            shipments=shipments, type_=type_, datetime=datetime).render()
 
-            with tempfile.NamedTemporaryFile(
-                    dir=systemlogic.path,
-                    prefix='%s-%s-' % (dbname, shipment.code),
-                    suffix='.xml', delete=False) as temp:
-                temp.write(xml)
-            logging.getLogger('systemlogics-modula').info(
-                'Generated XML %s' % (temp.name))
-            temp.close()
+        with tempfile.NamedTemporaryFile(
+                dir=systemlogic.path,
+                prefix='%s-' % (dbname),
+                suffix='.xml', delete=False) as temp:
+            temp.write(xml)
+        logging.getLogger('systemlogics-modula').info(
+            'Generated XML %s' % (temp.name))
+        temp.close()
 
     @classmethod
     def imp_articoli(self, products):
@@ -189,14 +188,13 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         dbname = Transaction().cursor.dbname
 
-        for product in products:
-            xml = tmpl.generate(product=product).render()
+        xml = tmpl.generate(products=products).render()
 
-            with tempfile.NamedTemporaryFile(
-                    dir=systemlogic.path,
-                    prefix='%s-%s-' % (dbname, product.code or product.id),
-                    suffix='.xml', delete=False) as temp:
-                temp.write(xml)
-            logging.getLogger('systemlogics-modula').info(
-                'Generated XML %s' % (temp.name))
-            temp.close()
+        with tempfile.NamedTemporaryFile(
+                dir=systemlogic.path,
+                prefix='%s-' % (dbname),
+                suffix='.xml', delete=False) as temp:
+            temp.write(xml.encode('utf-8'))
+        logging.getLogger('systemlogics-modula').info(
+            'Generated XML %s' % (temp.name))
+        temp.close()

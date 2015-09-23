@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- This file is part systemlogics_modula module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- systemlogics.modula.articoli.result - Wizard -->
+        <record model="ir.ui.view" id="systemlogics_modula_articoli_result">
+            <field name="model">systemlogics.modula.articoli.result</field>
+            <field name="type">form</field>
+            <field name="name">systemlogics_modula_articoli_result</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_systemlogics_modula_articoli">
+            <field name="name">Export Products Modula</field>
+            <field name="wiz_name">systemlogics.modula.articoli</field>
+            <field name="model">product.product</field>
+        </record>
+        <record model="ir.action.keyword" id="systemlogics_modula_articoli_keyword">
+            <field name="keyword">form_action</field>
+            <field name="model">product.product,-1</field>
+            <field name="action" ref="wizard_systemlogics_modula_articoli"/>
+        </record>
+        <record model="ir.action-res.group"
+            id="action_group_wizard_systemlogics_modula_articoli">
+            <field name="action" ref="wizard_systemlogics_modula_articoli"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
+    </data>
+</tryton>

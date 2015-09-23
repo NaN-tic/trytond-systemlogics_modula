@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <SYSTORE_ARTICOLI xmlns:py="http://genshi.edgewall.org/">
-  <IMP_ARTICOLI>
+  <IMP_ARTICOLI py:for="product in products">
     <ART_ARTICOLO>${product.code}</ART_ARTICOLO>
     <ART_DES>${product.rec_name[:100]}</ART_DES>
     <ART_UMI>${product.default_uom.symbol}</ART_UMI>
