@@ -130,7 +130,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 dir=systemlogic.path,
                 prefix='%s-' % (dbname),
                 suffix='.xml', delete=False) as temp:
-            temp.write(xml)
+            temp.write(xml.encode('utf-8'))
         logging.getLogger('systemlogics-modula').info(
             'Generated XML %s' % (temp.name))
         temp.close()
