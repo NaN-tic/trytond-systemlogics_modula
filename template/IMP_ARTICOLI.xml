@@ -9,9 +9,7 @@
     <ART_TIPOGESTART></ART_TIPOGESTART>
     <ART_FIFOP></ART_FIFOP>
     <ART_FIFOV></ART_FIFOV>
-    <ART_NOTE>
-        ${(code.number+'\n        ' for code in product.codes)}
-    </ART_NOTE>
+    <ART_NOTE><?python codes = ', '.join([c.number for c in product.codes])?>${codes}</ART_NOTE>
     <ART_CLAMOV></ART_CLAMOV>
   </IMP_ARTICOLI>
 </SYSTORE_ARTICOLI>
