@@ -12,4 +12,6 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
     <field name="dbhost"/>
     <label name="path"/>
     <field name="path"/>
+    <label name="not_completed"/>
+    <field name="not_completed"/>
 </form>
