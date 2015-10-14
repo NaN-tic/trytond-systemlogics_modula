@@ -24,6 +24,9 @@ class ShipmentOut:
 
         systemlogics_shipments = []
         for s in shipments:
+            if hasattr(s, 'review'):
+                if s.review:
+                    continue
             systemLogics = False
             for move in s.inventory_moves:
                 if move.from_location.systemlogics_modula:
@@ -36,7 +39,7 @@ class ShipmentOut:
             cls.write(systemlogics_shipments, {'systemlogics_modula': True})
 
             # Force not get a rollback to generate XML file
-            shipment_ids = [shipment.id for shipment in shipments]
+            shipment_ids = [s.id for s in systemlogics_shipments]
             Transaction().cursor.commit()
             # Search shipment ID to sure not have a rollback
             shipments = cls.search([
