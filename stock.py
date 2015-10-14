@@ -12,6 +12,8 @@ __metaclass__ = PoolMeta
 class ShipmentOut:
     __name__ = 'stock.shipment.out'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
+    systemlogics_modula_completed = fields.Boolean(
+        'SystemLogics Modula Completed')
 
     @staticmethod
     def default_systemlogics_modula():
@@ -22,29 +24,44 @@ class ShipmentOut:
         '''Active System Logics process when a move from location is systemlogics marked'''
         SystemLogicsModula = Pool().get('systemlogics.modula')
 
-        systemlogics_shipments = []
+        s_completed = [] # shipments completed
+        s_incompleted = [] # shipments incompleted
         for s in shipments:
             if hasattr(s, 'review'):
                 if s.review:
                     continue
             systemLogics = False
+            completed = True
             for move in s.inventory_moves:
                 if move.from_location.systemlogics_modula:
                     systemLogics = True
-                    break
+                else:
+                    completed = False
             if systemLogics:
-                systemlogics_shipments.append(s)
+                if completed:
+                    s_completed.append(s)
+                else:
+                    s_incompleted.append(s)
 
-        if systemlogics_shipments:
-            cls.write(systemlogics_shipments, {'systemlogics_modula': True})
+        if s_completed or s_incompleted:
+            if s_completed:
+                cls.write(s_completed, {
+                    'systemlogics_modula': True,
+                    'systemlogics_modula_completed': True,
+                    })
+            if s_incompleted:
+                cls.write(s_incompleted, {
+                    'systemlogics_modula': True,
+                    'systemlogics_modula_completed': False,
+                    })
 
             # Force not get a rollback to generate XML file
-            shipment_ids = [s.id for s in systemlogics_shipments]
+            shipment_ids = [s.id for s in (s_completed + s_incompleted)]
             Transaction().cursor.commit()
             # Search shipment ID to sure not have a rollback
             shipments = cls.search([
                 ('id', 'in', shipment_ids),
-                ])
+                ], order=[('systemlogics_modula_completed', 'DESC')])
             SystemLogicsModula.imp_ordini(
                 shipments, template='IMP_ORDINI_OUT', type_='P')
 

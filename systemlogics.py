@@ -41,6 +41,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
             },
         depends=['state'])
     active = fields.Boolean('Active', select=True)
+    not_completed = fields.Char('Not completed',
+        help='Not completed message')
 
     @staticmethod
     def default_dbhost():
@@ -123,8 +125,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         dbname = Transaction().cursor.dbname
 
-        xml = tmpl.generate(
-            shipments=shipments, type_=type_, datetime=datetime).render()
+        xml = tmpl.generate(systemlogic=systemlogic, shipments=shipments,
+            type_=type_, datetime=datetime).render()
 
         with tempfile.NamedTemporaryFile(
                 dir=systemlogic.path,

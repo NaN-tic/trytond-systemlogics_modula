@@ -20,5 +20,17 @@
       <RIG_PRIO>0</RIG_PRIO>
       <RIG_REQ_NOTE/>
     </IMP_ORDINI_RIGHE>
+    <IMP_ORDINI_RIGHE py:if="not shipment.systemlogics_modula_completed">
+      <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
+      <RIG_ARTICOLO>${systemlogic.not_completed or'Not completed'}</RIG_ARTICOLO>
+      <RIG_SUB1/>
+      <RIG_SUB2/>
+      <RIG_STAMATE/>
+      <RIG_TIPOCONF/>
+      <RIG_HOSTINF>999999</RIG_HOSTINF>
+      <RIG_QTAR>1</RIG_QTAR>
+      <RIG_PRIO>0</RIG_PRIO>
+      <RIG_REQ_NOTE/>
+    </IMP_ORDINI_RIGHE>
   </IMP_ORDINI>
 </SYSTORE_ORDINI>
