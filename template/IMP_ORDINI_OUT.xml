@@ -8,7 +8,8 @@
     <ORD_CLIENTE>${shipment.customer.name[:50]}</ORD_CLIENTE>
     <ORD_SPEDIZIONE></ORD_SPEDIZIONE>
     <ORD_GEST_PKL></ORD_GEST_PKL>
-    <IMP_ORDINI_RIGHE py:for="move in shipment.outgoing_moves">
+    <py:for each="move in shipment.inventory_moves">
+    <IMP_ORDINI_RIGHE py:if="move.from_location.systemlogics_modula">
       <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
       <RIG_ARTICOLO>${move.product.code or move.product.rec_name}</RIG_ARTICOLO>
       <RIG_SUB1/>
@@ -20,6 +21,7 @@
       <RIG_PRIO>0</RIG_PRIO>
       <RIG_REQ_NOTE/>
     </IMP_ORDINI_RIGHE>
+    </py:for>
     <IMP_ORDINI_RIGHE py:if="not shipment.systemlogics_modula_completed">
       <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
       <RIG_ARTICOLO>${systemlogic.not_completed or'Not completed'}</RIG_ARTICOLO>
