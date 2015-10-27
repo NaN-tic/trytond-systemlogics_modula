@@ -12,6 +12,7 @@ def register():
         SystemLogicsModula,
         Location,
         Product,
+        ShipmentIn,
         ShipmentOut,
         ShipmentInternal,
         SystemlogicsModulaArticoli,

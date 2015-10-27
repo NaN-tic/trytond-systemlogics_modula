@@ -63,11 +63,15 @@ class SystemLogicsModula(ModelSQL, ModelView):
     @classmethod
     def imp_ordini(self, shipments, template='IMP_ORDINI_OUT', type_='P'):
         Location = Pool().get('stock.location')
-
         shipments_ordini = []
         for shipment in shipments:
-            if shipment.state != 'assigned':
-                continue
+            if shipment.__name__ == 'stock.shipment.in':
+                if shipment.state != 'received':
+                    continue
+            else:
+                if shipment.state != 'assigned':
+                    continue
+
             if not hasattr(shipment, 'warehouse'):
                 warehouse = Transaction().context.get('stock_warehouse')
                 if not warehouse:
@@ -100,7 +104,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                         systemlogic.id,
                         ))
                 return
-    
+
             ordini = getattr(self, 'imp_ordini_%s' % systemlogic.dbhost)
             ordini(systemlogic, shipments, template, type_)
 
