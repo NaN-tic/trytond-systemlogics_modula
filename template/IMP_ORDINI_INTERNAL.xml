@@ -8,7 +8,7 @@
     <ORD_CLIENTE></ORD_CLIENTE>
     <ORD_SPEDIZIONE></ORD_SPEDIZIONE>
     <ORD_GEST_PKL></ORD_GEST_PKL>
-    <IMP_ORDINI_RIGHE py:for="move in shipment.inventory_moves">
+    <IMP_ORDINI_RIGHE py:for="move in shipment.moves">
       <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
       <RIG_ARTICOLO>${move.product.code or move.product.rec_name}</RIG_ARTICOLO>
       <RIG_SUB1/>

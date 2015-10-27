@@ -5,8 +5,50 @@ from trytond.pool import Pool, PoolMeta
 from trytond.model import fields
 from trytond.transaction import Transaction
 
-__all__ = ['ShipmentOut', 'ShipmentInternal']
+__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal']
 __metaclass__ = PoolMeta
+
+
+class ShipmentIn:
+    __name__ = 'stock.shipment.in'
+    systemlogics_modula = fields.Boolean('SystemLogics Modula')
+
+    @staticmethod
+    def default_systemlogics_modula():
+        return False
+
+    @classmethod
+    def generate_systemlogics_modula(cls, shipments):
+        '''Active System Logics process when a move location is systemlogics marked'''
+        SystemLogicsModula = Pool().get('systemlogics.modula')
+
+        deposit_shipments = []
+        for s in shipments:
+            systemLogics = False
+            for move in s.inventory_moves:
+                if move.to_location.systemlogics_modula:
+                    systemLogics = True
+
+            if systemLogics:
+                deposit_shipments.append(s)
+
+        if deposit_shipments:
+            cls.write(deposit_shipments, {'systemlogics_modula': True})
+
+            # Force not get a rollback to generate XML file
+            shipment_ids = [s.id for s in deposit_shipments]
+            Transaction().cursor.commit()
+            # Search shipment ID to sure not have a rollback
+            shipments = cls.search([
+                ('id', 'in', shipment_ids),
+                ])
+            SystemLogicsModula.imp_ordini(
+                shipments, template='IMP_ORDINI_IN', type_='V')
+
+    @classmethod
+    def receive(cls, shipments):
+        super(ShipmentIn, cls).receive(shipments)
+        cls.generate_systemlogics_modula(shipments)
 
 
 class ShipmentOut:
@@ -115,7 +157,7 @@ class ShipmentInternal:
                     ('id', 'in', deposit_shipments_ids),
                     ])
                 SystemLogicsModula.imp_ordini(
-                    dep_shipments, template='IMP_ORDINI_IN', type_='V')
+                    dep_shipments, template='IMP_ORDINI_INTERNAL', type_='V')
 
     @classmethod
     def assign(cls, shipments):
