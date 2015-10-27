@@ -130,7 +130,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         with tempfile.NamedTemporaryFile(
                 dir=systemlogic.path,
-                prefix='%s-' % (dbname),
+                prefix='%s-%s-' % (dbname,
+                    datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
             temp.write(xml.encode('utf-8'))
         logging.getLogger('systemlogics-modula').info(
@@ -194,7 +195,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         with tempfile.NamedTemporaryFile(
                 dir=systemlogic.path,
-                prefix='%s-' % (dbname),
+                prefix='%s-%s-' % (dbname,
+                    datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
             temp.write(xml.encode('utf-8'))
         logging.getLogger('systemlogics-modula').info(
