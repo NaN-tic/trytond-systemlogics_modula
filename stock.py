@@ -2,8 +2,9 @@
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
 from trytond.pool import Pool, PoolMeta
-from trytond.model import fields
+from trytond.model import  ModelView, fields
 from trytond.transaction import Transaction
+from trytond.pyson import Eval
 
 __all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal']
 __metaclass__ = PoolMeta
@@ -13,9 +14,26 @@ class ShipmentIn:
     __name__ = 'stock.shipment.in'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
+    @classmethod
+    def __setup__(cls):
+        super(ShipmentIn, cls).__setup__()
+        cls._buttons.update({
+            'do_systemlogics_modula': {
+                'invisible': Eval('state').in_(['draft', 'cancel']),
+                },
+            })
+
     @staticmethod
     def default_systemlogics_modula():
         return False
+
+    @classmethod
+    def copy(cls, shipments, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['systemlogics_modula'] = None
+        return super(ShipmentIn, cls).copy(shipments, default=default)
 
     @classmethod
     def generate_systemlogics_modula(cls, shipments):
@@ -46,8 +64,8 @@ class ShipmentIn:
                 shipments, template='IMP_ORDINI_IN', type_='V')
 
     @classmethod
-    def receive(cls, shipments):
-        super(ShipmentIn, cls).receive(shipments)
+    @ModelView.button
+    def do_systemlogics_modula(cls, shipments):
         cls.generate_systemlogics_modula(shipments)
 
 
@@ -60,6 +78,15 @@ class ShipmentOut:
     @staticmethod
     def default_systemlogics_modula():
         return False
+
+    @classmethod
+    def copy(cls, shipments, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['systemlogics_modula'] = None
+        default['systemlogics_modula_completed'] = None
+        return super(ShipmentOut, cls).copy(shipments, default=default)
 
     @classmethod
     def generate_systemlogics_modula(cls, shipments):
@@ -122,6 +149,14 @@ class ShipmentInternal:
     @staticmethod
     def default_systemlogics_modula():
         return False
+
+    @classmethod
+    def copy(cls, shipments, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['systemlogics_modula'] = None
+        return super(ShipmentInternal, cls).copy(shipments, default=default)
 
     @classmethod
     def generate_systemlogics_modula(cls, shipments):
