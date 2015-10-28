@@ -66,7 +66,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
         shipments_ordini = []
         for shipment in shipments:
             if shipment.__name__ == 'stock.shipment.in':
-                if shipment.state != 'received':
+                if shipment.state not in ['received', 'done']:
                     continue
             else:
                 if shipment.state != 'assigned':

@@ -10,6 +10,10 @@ msgctxt "field:stock.location,systemlogics_modula:"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
 
+msgctxt "field:stock.shipment.in,systemlogics_modula:"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
 msgctxt "field:stock.shipment.internal,systemlogics_modula:"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
@@ -17,6 +21,10 @@ msgstr "SystemLogics Modula"
 msgctxt "field:stock.shipment.out,systemlogics_modula:"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
+
+msgctxt "field:stock.shipment.out,systemlogics_modula_completed:"
+msgid "SystemLogics Modula Completed"
+msgstr "Completat SystemLogics Modula"
 
 msgctxt "field:systemlogics.modula,active:"
 msgid "Active"
@@ -41,6 +49,10 @@ msgstr "ID"
 msgctxt "field:systemlogics.modula,name:"
 msgid "Name"
 msgstr "Nom"
+
+msgctxt "field:systemlogics.modula,not_completed:"
+msgid "Not completed"
+msgstr "No completat"
 
 msgctxt "field:systemlogics.modula,path:"
 msgid "Path"
@@ -74,6 +86,10 @@ msgctxt "help:stock.location,systemlogics_modula:"
 msgid "SystemLogics Modula location"
 msgstr "Ubicació SystemLogics Modula"
 
+msgctxt "help:systemlogics.modula,not_completed:"
+msgid "Not completed message"
+msgstr "Missatge no completat"
+
 msgctxt "help:systemlogics.modula,warehouse:"
 msgid "System Logics Warehouse"
 msgstr "Magatzem SystemLogics Modula"
@@ -103,7 +119,7 @@ msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
 
 msgctxt "model:res.group,name:group_systemlogics_modula_admin"
-msgid "SystemLogics Modula Administration"
+msgid "SystemLogics Administration"
 msgstr "Administrador SystemLogics Modula"
 
 msgctxt "model:systemlogics.modula,name:"
@@ -117,6 +133,10 @@ msgstr "Resultat SystemLogics Modula Articoli"
 msgctxt "selection:systemlogics.modula,dbhost:"
 msgid "XML"
 msgstr "XML"
+
+msgctxt "view:stock.shipment.in:"
+msgid "Modula"
+msgstr "Modula"
 
 msgctxt "view:systemlogics.modula.articoli.result:"
 msgid "Export Product XML Modula"
