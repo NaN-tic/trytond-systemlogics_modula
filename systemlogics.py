@@ -20,6 +20,7 @@ __all__ = ['SystemLogicsModula', 'SystemLogicsModulaEXPOrdiniFile']
 loader = genshi.template.TemplateLoader(
     os.path.join(os.path.dirname(__file__), 'template'),
     auto_reload=True)
+logger = logging.getLogger(__name__)
 
 
 class SystemLogicsModula(ModelSQL, ModelView):
@@ -91,7 +92,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 ('warehouse', '=', warehouse),
                 ], limit=1)
             if not systemlogics:
-                logging.getLogger('systemlogics-modula').warning(
+                logger.warning(
                     'Configure a IMP_ORDINI related with "%s" warehouse.' % (
                         warehouse.name))
                 return
@@ -99,7 +100,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             systemlogic, = systemlogics
 
             if not os.path.isdir(systemlogic.path):
-                logging.getLogger('systemlogics-modula').warning(
+                logger.warning(
                     'Directory "%s" not exist (ID: %s)' % (
                         systemlogic.path,
                         systemlogic.id,
@@ -111,18 +112,15 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
     @classmethod
     def imp_ordini_odbc(self, systemlogic, shipments, template, type_):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ORDINI ODBC not supported')
+        logger.error('IMP_ORDINI ODBC not supported')
 
     @classmethod
     def imp_ordini_ascii(self, systemlogic, shipments, template, type_):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ORDINI ASCII not supported')
+        logger.error('IMP_ORDINI ASCII not supported')
 
     @classmethod
     def imp_ordini_excel(self, systemlogic, shipments, template, type_):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ORDINI EXCEL not supported')
+        logger.error('IMP_ORDINI EXCEL not supported')
 
     @classmethod
     def imp_ordini_xml(self, systemlogic, shipments, template, type_):
@@ -139,8 +137,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                     datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
             temp.write(xml.encode('utf-8'))
-        logging.getLogger('systemlogics-modula').info(
-            'Generated XML %s' % (temp.name))
+        logger.info('Generated XML %s' % (temp.name))
         temp.close()
 
     @classmethod
@@ -157,7 +154,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             ('warehouse', '=', warehouse),
             ], limit=1)
         if not systemlogics:
-            logging.getLogger('systemlogics-modula').warning(
+            logger.warning(
                 'Configure a IMP_ARTICOLI related with "%s" warehouse.' % (
                     warehouse.name))
             return
@@ -165,7 +162,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
         systemlogic, = systemlogics
 
         if not os.path.isdir(systemlogic.path):
-            logging.getLogger('systemlogics-modula').warning(
+            logger.warning(
                 'Directory "%s" not exist (ID: %s)' % (
                     systemlogic.path,
                     systemlogic.id,
@@ -177,18 +174,15 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
     @classmethod
     def imp_articoli_odbc(self, products):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ARTICOLI ODBC not supported')
+        logger.error('IMP_ARTICOLI ODBC not supported')
 
     @classmethod
     def imp_articoli_ascii(self, products):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ARTICOLI ASCII not supported')
+        logger.error('IMP_ARTICOLI ASCII not supported')
 
     @classmethod
     def imp_articoli_excel(self, products):
-        logging.getLogger('systemlogics-modula').error(
-            'IMP_ARTICOLI EXCEL not supported')
+        logger.error('IMP_ARTICOLI EXCEL not supported')
 
     @classmethod
     def imp_articoli_xml(self, systemlogic, products):
@@ -204,16 +198,14 @@ class SystemLogicsModula(ModelSQL, ModelView):
                     datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
             temp.write(xml.encode('utf-8'))
-        logging.getLogger('systemlogics-modula').info(
-            'Generated XML %s' % (temp.name))
+        logger.info('Generated XML %s' % (temp.name))
         temp.close()
 
     @classmethod
     def export_ordini_file(cls, args=None):
         EXPOrdiniFile = Pool().get('systemlogics.modula.exp.ordini.file')
 
-        logging.getLogger('systemlogics-modula').info(
-            'Start read SystemLogics Module files')
+        logger.info('Start read SystemLogics Module files')
 
         modulas = cls.search([
                 ('name', '=', 'EXP_ORDINI'),
@@ -225,8 +217,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             try:
                 filenames = os.listdir(modula.path)
             except OSError, e:
-                logging.getLogger('systemlogics-modula').warning(
-                    'Error reading path: %s' % e)
+                logger.warning('Error reading path: %s' % e)
                 continue
             for filename in filenames:
                 fullname = '%s/%s' % (modula.path, filename)
@@ -240,8 +231,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 try:
                     content = open(fullname, 'r').read()
                 except IOError, e:
-                    logging.getLogger('systemlogics-modula').warning(
-                        'Error reading file %s: %s' % (fullname, e))
+                    logger.warning('Error reading file %s: %s' % (fullname, e))
                     continue
                 values['name'] = filename
                 values['modula'] = modula.id
@@ -256,8 +246,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 os.remove(filename)
             except OSError:
                 pass
-        logging.getLogger('systemlogics-modula').info(
-            'Loaded SystemLogics Module %s files' % (len(to_delete)))
+        logger.info('Loaded SystemLogics Module %s files' % (len(to_delete)))
 
 
 class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
