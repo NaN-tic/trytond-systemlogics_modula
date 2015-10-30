@@ -6,6 +6,7 @@ from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
 from trytond.transaction import Transaction
 from itertools import groupby
+from xml.dom.minidom import parseString
 import genshi
 import genshi.template
 import os
@@ -14,7 +15,7 @@ import logging
 import datetime
 import tempfile
 
-__all__ = ['SystemLogicsModula']
+__all__ = ['SystemLogicsModula', 'SystemLogicsModulaEXPOrdiniFile']
 
 loader = genshi.template.TemplateLoader(
     os.path.join(os.path.dirname(__file__), 'template'),
@@ -170,7 +171,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                     systemlogic.id,
                     ))
             return
-    
+
         articoli = getattr(self, 'imp_articoli_%s' % systemlogic.dbhost)
         articoli(systemlogic, products)
 
@@ -206,3 +207,142 @@ class SystemLogicsModula(ModelSQL, ModelView):
         logging.getLogger('systemlogics-modula').info(
             'Generated XML %s' % (temp.name))
         temp.close()
+
+    @classmethod
+    def export_ordini_file(cls, args=None):
+        EXPOrdiniFile = Pool().get('systemlogics.modula.exp.ordini.file')
+
+        logging.getLogger('systemlogics-modula').info(
+            'Start read SystemLogics Module files')
+
+        modulas = cls.search([
+                ('name', '=', 'EXP_ORDINI'),
+                ])
+
+        vlist = []
+        to_delete = []
+        for modula in modulas:
+            try:
+                filenames = os.listdir(modula.path)
+            except OSError, e:
+                logging.getLogger('systemlogics-modula').warning(
+                    'Error reading path: %s' % e)
+                continue
+            for filename in filenames:
+                fullname = '%s/%s' % (modula.path, filename)
+                values = {}
+                exp_ordini_file = EXPOrdiniFile.search([
+                        ('name', '=', filename)
+                        ])
+                if exp_ordini_file:
+                    to_delete.append(fullname)
+                    continue
+                try:
+                    content = open(fullname, 'r').read()
+                except IOError, e:
+                    logging.getLogger('systemlogics-modula').warning(
+                        'Error reading file %s: %s' % (fullname, e))
+                    continue
+                values['name'] = filename
+                values['modula'] = modula.id
+                values['content'] = content
+                values['state'] = 'pending'
+                vlist.append(values)
+                to_delete.append(fullname)
+        ordini_files = EXPOrdiniFile.create(vlist)
+        EXPOrdiniFile.process_export_ordini(ordini_files)
+        for filename in to_delete:
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+        logging.getLogger('systemlogics-modula').info(
+            'Loaded SystemLogics Module %s files' % (len(to_delete)))
+
+
+class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
+    'SystemLogics Modula EXP Ordini File'
+    __name__ = 'systemlogics.modula.exp.ordini.file'
+    name = fields.Char('Name', required=True)
+    modula = fields.Many2One('systemlogics.modula', "Systemlogics Modula",
+        required=True)
+    content = fields.Text('Content', readonly=True)
+    state = fields.Selection([
+        ('pending', 'Pending'),
+        ('done', 'Done'),
+        ], 'State', readonly=True)
+
+    @classmethod
+    def __setup__(cls):
+        super(SystemLogicsModulaEXPOrdiniFile, cls).__setup__()
+        cls._sql_constraints += [
+            ('name_uniq', 'UNIQUE(name)', 'Name must be unique.'),
+            ]
+        cls._buttons.update({
+                'process_export_ordini': {
+                    'invisible': Eval('state') != 'pending',
+                    },
+                })
+
+    @classmethod
+    def default_state(cls):
+        return 'pending'
+
+    @classmethod
+    @ModelView.button
+    def process_export_ordini(cls, executions, trigger=None):
+        ''''
+        Read EXP ORDINI file
+        1- Try to done a move (RIG_HOSTINF is ID move)
+        2- Try to packed shipment if all moves are done
+        '''
+        pool = Pool()
+        Move = pool.get('stock.move')
+        Shipment = pool.get('stock.shipment.out')
+
+        to_do = []
+        update_executions = []
+        shipments = set()
+        for execution in executions:
+            execution_to_done = True
+            dom = parseString(execution.content)
+            quantities = {}
+            moves = []
+            for o in dom.getElementsByTagName('EXP_ORDINI_RIGHE'):
+                move = {}
+                id_ = (o.getElementsByTagName('RIG_HOSTINF')[0]
+                    .firstChild.data)
+                moves.append(id_)
+                quantities[int(id_)] = float(
+                    o.getElementsByTagName('RIG_QTAE')
+                    [0].firstChild.data.replace(',', '.'))
+
+            moves = Move.search([
+                    ('id', 'in', moves)
+                    ])
+            for move in moves:
+                if (quantities[move.id] == move.quantity
+                        and move.shipment.state == 'assigned'):
+                    to_do.append(move)
+                    shipments.add(move.shipment)
+                else:
+                    execution_to_done = False
+            if execution_to_done:
+                update_executions.append(execution)
+
+        if to_do:
+            Move.do(to_do)
+
+        to_package = []
+        for shipment in shipments:
+            package = True
+            for move in shipment.outgoing_moves:
+                if move.state != 'done':
+                    package = False
+            if package:
+                to_package.append(shipment)
+        if to_package:
+            Shipment.pack(to_package)
+
+        if update_executions:
+            cls.write(update_executions, {'state': 'done'})

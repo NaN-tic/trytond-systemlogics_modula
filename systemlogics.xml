@@ -53,6 +53,74 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         <menuitem parent="menu_systemlogics_modula" action="act_systemlogics_modula_form"
             id="menu_systemlogics_modula_form"/>
 
+        <!-- systemlogics.modula.exp.ordini.file -->
+        <record model="ir.ui.view" id="systemlogics_modula_exp_ordini_file_view_tree">
+            <field name="model">systemlogics.modula.exp.ordini.file</field>
+            <field name="type">tree</field>
+            <field name="name">systemlogics_modula_exp_ordini_file_tree</field>
+        </record>
+
+        <record model="ir.ui.view" id="systemlogics_modula_exp_ordini_file_view_form">
+            <field name="model">systemlogics.modula.exp.ordini.file</field>
+            <field name="type">form</field>
+            <field name="name">systemlogics_modula_exp_ordini_file_form</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_systemlogics_modula_exp_ordini_file">
+            <field name="name">SystemLogics Modula EXP Ordini Files</field>
+            <field name="res_model">systemlogics.modula.exp.ordini.file</field>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_systemlogics_modula_exp_ordini_file_tree">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="systemlogics_modula_exp_ordini_file_view_tree"/>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_systemlogics_modula_exp_ordini_file_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="systemlogics_modula_exp_ordini_file_view_form"/>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_pending">
+            <field name="name">Pending</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain">[('state', '=', 'pending')]</field>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_done">
+            <field name="name">Done</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain">[('state', '=', 'done')]</field>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="30"/>
+            <field name="domain"></field>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
+
+        <menuitem
+            id="menu_systemlogics_modula_exp_ordini_file"
+            parent="menu_systemlogics_modula"
+            action="act_systemlogics_modula_exp_ordini_file"
+            name="EXP Ordini Files"/>
+
+        <!-- CRON for systemlogics.modula -->
+        <record model="ir.cron" id="cron_export_ordini_file">
+            <field name="name">Export Ordini Files</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="res.user_trigger"/>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="number_calls">-1</field>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">systemlogics.modula</field>
+            <field name="function">export_ordini_file</field>
+        </record>
+
         <!-- Access -->
         <record model="ir.model.access" id="access_systemlogics_modula">
             <field name="model" search="[('model', '=', 'systemlogics.modula')]"/>
@@ -64,6 +132,14 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         <record model="ir.model.access" id="access_systemlogics_modula_admin">
             <field name="model" search="[('model', '=', 'systemlogics.modula')]"/>
             <field name="group" ref="group_systemlogics_modula_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_systemlogics_modula_exp_ordini_file">
+            <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
+            <field name="group" ref="group_systemlogics_modula"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
