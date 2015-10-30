@@ -10,6 +10,7 @@ from .stock import *
 def register():
     Pool.register(
         SystemLogicsModula,
+        SystemLogicsModulaEXPOrdiniFile,
         Location,
         Product,
         ShipmentIn,
