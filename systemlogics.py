@@ -258,6 +258,8 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
     content = fields.Text('Content', readonly=True)
     state = fields.Selection([
         ('pending', 'Pending'),
+        ('in_progress', 'In progress'),
+        ('failed', 'Failed'),
         ('done', 'Done'),
         ], 'State', readonly=True)
 
@@ -269,7 +271,7 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
             ]
         cls._buttons.update({
                 'process_export_ordini': {
-                    'invisible': Eval('state') != 'pending',
+                    'invisible': ~Eval('state').in_(['pending', 'failed']),
                     },
                 })
 
@@ -279,7 +281,7 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
-    def process_export_ordini(cls, executions, trigger=None):
+    def process_export_ordini(cls, ordini_files, trigger=None):
         ''''
         Read EXP ORDINI file
         1- Try to done a move (RIG_HOSTINF is ID move)
@@ -288,13 +290,18 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
         pool = Pool()
         Move = pool.get('stock.move')
         Shipment = pool.get('stock.shipment.out')
+        EXPOrdiniFile = pool.get('systemlogics.modula.exp.ordini.file')
+
+        EXPOrdiniFile.write(ordini_files, {'state': 'in_progress'})
+        Transaction().cursor.commit()
 
         to_do = []
-        update_executions = []
+        done_ordini_files = []
+        fail_ordini_files = []
         shipments = set()
-        for execution in executions:
-            execution_to_done = True
-            dom = parseString(execution.content)
+        for ofile in ordini_files:
+            dom = parseString(ofile.content)
+
             quantities = {}
             moves = []
             for o in dom.getElementsByTagName('EXP_ORDINI_RIGHE'):
@@ -314,24 +321,28 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
                         and move.shipment.state == 'assigned'):
                     to_do.append(move)
                     shipments.add(move.shipment)
-                else:
-                    execution_to_done = False
-            if execution_to_done:
-                update_executions.append(execution)
+            done_ordini_files.append(ofile)
 
         if to_do:
-            Move.do(to_do)
+            Move.do(to_do) # TODO try/except move error
+
+        if shipments:
+            Shipment._sync_inventory_to_outgoing(shipments)
+            Move.assign([m for s in shipments for m in s.outgoing_moves])
 
         to_package = []
         for shipment in shipments:
             package = True
             for move in shipment.outgoing_moves:
-                if move.state != 'done':
+                if move.state != 'assigned':
                     package = False
             if package:
                 to_package.append(shipment)
+
         if to_package:
             Shipment.pack(to_package)
 
-        if update_executions:
-            cls.write(update_executions, {'state': 'done'})
+        if done_ordini_files:
+            cls.write(done_ordini_files, {'state': 'done'})
+        if fail_ordini_files:
+            cls.write(fail_ordini_files, {'state': 'failed'})
