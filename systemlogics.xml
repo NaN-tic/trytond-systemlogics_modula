@@ -19,8 +19,10 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
-        <!-- Menu Top -->
+        <!-- Menus -->
         <menuitem parent="stock.menu_configuration"
+            name="SystemLogics Modula" id="menu_systemlogics_modula_configuration"/>
+        <menuitem parent="stock.menu_stock"
             name="SystemLogics Modula" id="menu_systemlogics_modula"/>
 
         <!-- systemlogics -->
@@ -50,7 +52,8 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="view" ref="systemlogics_modula_view_form"/>
             <field name="act_window" ref="act_systemlogics_modula_form"/>
         </record>
-        <menuitem parent="menu_systemlogics_modula" action="act_systemlogics_modula_form"
+        <menuitem parent="menu_systemlogics_modula_configuration"
+            action="act_systemlogics_modula_form"
             id="menu_systemlogics_modula_form"/>
 
         <!-- systemlogics.modula.exp.ordini.file -->
@@ -88,6 +91,12 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="domain">[('state', '=', 'pending')]</field>
             <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
         </record>
+        <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_failed">
+            <field name="name">Failed</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain">[('state', '=', 'failed')]</field>
+            <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
+        </record>
         <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_done">
             <field name="name">Done</field>
             <field name="sequence" eval="20"/>
@@ -119,6 +128,18 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="repeat_missed" eval="False"/>
             <field name="model">systemlogics.modula</field>
             <field name="function">export_ordini_file</field>
+        </record>
+
+        <!-- Trigger for systemlogics.modula -->
+        <record model="ir.trigger" id="trigger_export_ordini_file">
+            <field name="name">SystemLogics Modula EXP Ordini File</field>
+            <field name="active" eval="True"/>
+            <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
+            <field name="on_create" eval="True"/>
+            <field name="condition">True</field>
+            <field name="limit_number">0</field>
+            <field name="action_model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
+            <field name="action_function">process_export_ordini</field>
         </record>
 
         <!-- Access -->
