@@ -5,6 +5,7 @@ from trytond.pool import Pool
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
 from trytond.transaction import Transaction
+from trytond.rpc import RPC
 from itertools import groupby
 from xml.dom.minidom import parseString
 import genshi
@@ -44,6 +45,13 @@ class SystemLogicsModula(ModelSQL, ModelView):
     active = fields.Boolean('Active', select=True)
     not_completed = fields.Char('Not completed',
         help='Not completed message')
+
+    @classmethod
+    def __setup__(cls):
+        super(SystemLogicsModula, cls).__setup__()
+        cls.__rpc__.update({
+            'export_ordini_file': RPC(readonly=False),
+            })
 
     @staticmethod
     def default_dbhost():
@@ -311,7 +319,11 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
         fail_ordini_files = []
         shipments = set()
         for ofile in ordini_files:
-            dom = parseString(ofile.content)
+            try:
+                dom = parseString(ofile.content)
+            except:
+                fail_ordini_files.append(ofile)
+                continue
 
             quantities = {}
             moves = []
