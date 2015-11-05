@@ -88,19 +88,19 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_pending">
             <field name="name">Pending</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('state', '=', 'pending')]</field>
+            <field name="domain" eval="[('state', '=', 'pending')]" pyson="1"/>
             <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_failed">
             <field name="name">Failed</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('state', '=', 'failed')]</field>
+            <field name="domain" eval="[('state', '=', 'failed')]" pyson="1"/>
             <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_done">
             <field name="name">Done</field>
             <field name="sequence" eval="20"/>
-            <field name="domain">[('state', '=', 'done')]</field>
+            <field name="domain" eval="[('state', '=', 'done')]" pyson="1"/>
             <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_systemlogics_modula_exp_ordini_file_all">
@@ -136,7 +136,7 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="active" eval="True"/>
             <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
             <field name="on_create" eval="True"/>
-            <field name="condition">True</field>
+            <field name="condition" eval="[(1, '=', 1)]" pyson="1"/>
             <field name="limit_number">0</field>
             <field name="action_model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
             <field name="action_function">process_export_ordini</field>
