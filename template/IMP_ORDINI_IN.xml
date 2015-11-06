@@ -8,7 +8,8 @@
     <ORD_CLIENTE></ORD_CLIENTE>
     <ORD_SPEDIZIONE></ORD_SPEDIZIONE>
     <ORD_GEST_PKL></ORD_GEST_PKL>
-    <IMP_ORDINI_RIGHE py:for="move in shipment.inventory_moves">
+    <py:for each="move in shipment.inventory_moves">
+    <IMP_ORDINI_RIGHE py:if="move.to_location.systemlogics_modula">
       <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
       <RIG_ARTICOLO>${move.product.code or move.product.rec_name}</RIG_ARTICOLO>
       <RIG_SUB1/>
@@ -20,5 +21,6 @@
       <RIG_PRIO>0</RIG_PRIO>
       <RIG_REQ_NOTE/>
     </IMP_ORDINI_RIGHE>
+    </py:for>
   </IMP_ORDINI>
 </SYSTORE_ORDINI>
