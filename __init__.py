@@ -15,10 +15,12 @@ def register():
         Product,
         ShipmentIn,
         ShipmentOut,
+        ShipmentOutSystemlogicsModulaExportStart,
         ShipmentInternal,
         SystemlogicsModulaArticoli,
         SystemlogicsModulaArticoliResult,
         module='systemlogics_modula', type_='model')
     Pool.register(
+        ShipmentOutSystemlogicsModulaExport,
         SystemlogicsModulaArticoli,
         module='systemlogics_modula', type_='wizard')

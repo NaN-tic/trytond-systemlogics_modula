@@ -5,8 +5,10 @@ from trytond.pool import Pool, PoolMeta
 from trytond.model import  ModelView, fields
 from trytond.transaction import Transaction
 from trytond.pyson import Eval
+from trytond.wizard import Wizard, StateView, Button, StateTransition
 
-__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal']
+__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal',
+    'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
 __metaclass__ = PoolMeta
 
 
@@ -198,3 +200,47 @@ class ShipmentInternal:
     def assign(cls, shipments):
         super(ShipmentInternal, cls).assign(shipments)
         cls.generate_systemlogics_modula(shipments)
+
+
+class ShipmentOutSystemlogicsModulaExportStart(ModelView):
+    'Customer shipments export Systemlogics Modula Start'
+    __name__ = 'stock.shipment.out.systemlogics.modula.export.start'
+    shipments = fields.Many2Many('stock.shipment.out', None, None, 'Shipments',
+        domain=[
+            ('state', 'in', ['assigned']),
+            ],
+        states={
+            'required': True,
+            },
+        help='Assigned customer shipments to export Systemlogics Modula.')
+
+    @staticmethod
+    def default_shipments():
+        ShipmentOut = Pool().get('stock.shipment.out')
+
+        active_ids = Transaction().context.get('active_ids', [])
+        shipments =  ShipmentOut.search([
+            ('id', 'in', active_ids),
+            ('state', 'in', ['assigned']),
+            ])
+        return [s.id for s in shipments]
+
+
+class ShipmentOutSystemlogicsModulaExport(Wizard):
+    'Customer shipments export Systemlogics Modula'
+    __name__ = 'stock.shipment.out.systemlogics.modula.export'
+
+    start = StateView('stock.shipment.out.systemlogics.modula.export.start',
+        'systemlogics_modula.shipment_out_export_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Export', 'export', 'tryton-ok', True),
+            ])
+    export = StateTransition()
+
+    def transition_export(self):
+        ShipmentOut = Pool().get('stock.shipment.out')
+
+        shipments = self.start.shipments
+        if shipments:
+            ShipmentOut.generate_systemlogics_modula(shipments)
+        return 'end'
