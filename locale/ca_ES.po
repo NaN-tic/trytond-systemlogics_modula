@@ -6,6 +6,10 @@ msgctxt "error:systemlogics.modula.articoli:"
 msgid "Export %s product/s (IMP ARTICOLI)"
 msgstr "Exportat %s producte/s (IMP ARTICOLI)"
 
+msgctxt "error:systemlogics.modula.exp.ordini.file:"
+msgid "Name must be unique."
+msgstr "El nom ha de ser únic."
+
 msgctxt "field:stock.location,systemlogics_modula:"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
@@ -25,6 +29,14 @@ msgstr "SystemLogics Modula"
 msgctxt "field:stock.shipment.out,systemlogics_modula_completed:"
 msgid "SystemLogics Modula Completed"
 msgstr "Completat SystemLogics Modula"
+
+msgctxt "field:stock.shipment.out.systemlogics.modula.export.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:stock.shipment.out.systemlogics.modula.export.start,shipments:"
+msgid "Shipments"
+msgstr "Albarans"
 
 msgctxt "field:systemlogics.modula,active:"
 msgid "Active"
@@ -82,9 +94,53 @@ msgctxt "field:systemlogics.modula.articoli.result,info:"
 msgid "Info"
 msgstr "Info"
 
+msgctxt "field:systemlogics.modula.exp.ordini.file,content:"
+msgid "Content"
+msgstr "Contingut"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,create_date:"
+msgid "Create Date"
+msgstr "Data creació"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,create_uid:"
+msgid "Create User"
+msgstr "Usuari creació"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,modula:"
+msgid "Systemlogics Modula"
+msgstr "Systemlogics Modula"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,rec_name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,state:"
+msgid "State"
+msgstr "Estat"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,write_date:"
+msgid "Write Date"
+msgstr "Data modificació"
+
+msgctxt "field:systemlogics.modula.exp.ordini.file,write_uid:"
+msgid "Write User"
+msgstr "Usuari modificació"
+
 msgctxt "help:stock.location,systemlogics_modula:"
 msgid "SystemLogics Modula location"
 msgstr "Ubicació SystemLogics Modula"
+
+msgctxt "help:stock.shipment.out.systemlogics.modula.export.start,shipments:"
+msgid "Assigned customer shipments to export Systemlogics Modula."
+msgstr "Albarans de client reservats a exportar Systemlogics Modula"
 
 msgctxt "help:systemlogics.modula,not_completed:"
 msgid "Not completed message"
@@ -94,13 +150,49 @@ msgctxt "help:systemlogics.modula,warehouse:"
 msgid "System Logics Warehouse"
 msgstr "Magatzem SystemLogics Modula"
 
+msgctxt "model:ir.action,name:act_systemlogics_modula_exp_ordini_file"
+msgid "SystemLogics Modula EXP Ordini Files"
+msgstr "Fitxers EXP Ordini SystemLogics Modula"
+
 msgctxt "model:ir.action,name:act_systemlogics_modula_form"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
 
+msgctxt "model:ir.action,name:wizard_shipment_out_export"
+msgid "Export Systemlogics Modula"
+msgstr "Exporta Systemlogics Modula"
+
 msgctxt "model:ir.action,name:wizard_systemlogics_modula_articoli"
 msgid "Export Products Modula"
 msgstr "Exporta productes Modula"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_systemlogics_modula_exp_ordini_file_all"
+msgid "All"
+msgstr "Tots"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_systemlogics_modula_exp_ordini_file_done"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_systemlogics_modula_exp_ordini_file_failed"
+msgid "Failed"
+msgstr "Fallat"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_systemlogics_modula_exp_ordini_file_pending"
+msgid "Pending"
+msgstr "Pendent"
+
+msgctxt "model:ir.cron,name:cron_export_ordini_file"
+msgid "Export Ordini Files"
+msgstr "Fitxers EXP Ordini"
+
+msgctxt "model:ir.trigger,name:trigger_export_ordini_file"
+msgid "SystemLogics Modula EXP Ordini File"
+msgstr "Fitxer EXP Ordini SystemLogics Modula"
 
 msgctxt "model:ir.ui.menu,name:"
 msgid "SystemLogics"
@@ -109,6 +201,14 @@ msgstr "SystemLogics"
 msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
+
+msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_configuration"
+msgid "SystemLogics Modula"
+msgstr "SystemLogics Modula"
+
+msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_exp_ordini_file"
+msgid "EXP Ordini Files"
+msgstr "Fitxers EXP Ordini"
 
 msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_form"
 msgid "SystemLogics Modula"
@@ -119,8 +219,12 @@ msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
 
 msgctxt "model:res.group,name:group_systemlogics_modula_admin"
-msgid "SystemLogics Administration"
+msgid "SystemLogics Modula Administration"
 msgstr "Administrador SystemLogics Modula"
+
+msgctxt "model:stock.shipment.out.systemlogics.modula.export.start,name:"
+msgid "Customer shipments export Systemlogics Modula Start"
+msgstr "Albarans de client assignats per exportar Systemlogics Modula"
 
 msgctxt "model:systemlogics.modula,name:"
 msgid "SystemLogics Modula"
@@ -130,21 +234,63 @@ msgctxt "model:systemlogics.modula.articoli.result,name:"
 msgid "Systemlogics Modula Articoli Result"
 msgstr "Resultat SystemLogics Modula Articoli"
 
+msgctxt "model:systemlogics.modula.exp.ordini.file,name:"
+msgid "SystemLogics Modula EXP Ordini File"
+msgstr "Fitxer EXP Ordini Systemlogics Modula"
+
 msgctxt "selection:systemlogics.modula,dbhost:"
 msgid "XML"
 msgstr "XML"
+
+msgctxt "selection:systemlogics.modula.exp.ordini.file,state:"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt "selection:systemlogics.modula.exp.ordini.file,state:"
+msgid "Failed"
+msgstr "Fallat"
+
+msgctxt "selection:systemlogics.modula.exp.ordini.file,state:"
+msgid "In progress"
+msgstr "En progrés"
+
+msgctxt "selection:systemlogics.modula.exp.ordini.file,state:"
+msgid "Pending"
+msgstr "Pendent"
 
 msgctxt "view:stock.shipment.in:"
 msgid "Modula"
 msgstr "Modula"
 
+msgctxt "view:stock.shipment.out.systemlogics.modula.export.start:"
+msgid "Export Shipments Out to Modula"
+msgstr "Exporta albarans client a Modula"
+
 msgctxt "view:systemlogics.modula.articoli.result:"
 msgid "Export Product XML Modula"
 msgstr "Exportar XML productes Modula"
 
+msgctxt "view:systemlogics.modula.exp.ordini.file:"
+msgid "Process"
+msgstr "En procés"
+
+msgctxt "view:systemlogics.modula.exp.ordini.file:"
+msgid "SystemLogics"
+msgstr "SystemLogics"
+
 msgctxt "view:systemlogics.modula:"
 msgid "SystemLogics"
 msgstr "SystemLogics"
+
+msgctxt ""
+"wizard_button:stock.shipment.out.systemlogics.modula.export,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+msgctxt ""
+"wizard_button:stock.shipment.out.systemlogics.modula.export,start,export:"
+msgid "Export"
+msgstr "Exporta"
 
 msgctxt "wizard_button:systemlogics.modula.articoli,result,end:"
 msgid "Close"
