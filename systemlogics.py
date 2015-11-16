@@ -159,6 +159,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
         if not warehouse:
             warehouse, = Location.search(
                 [('type', '=', 'warehouse')], limit=1)
+        else:
+            warehouse = Location(warehouse)
 
         systemlogics = self.search([
             ('name', '=', 'IMP_ARTICOLI'),
