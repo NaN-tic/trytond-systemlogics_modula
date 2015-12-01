@@ -3,7 +3,7 @@
 #the full copyright notices and license terms.
 from trytond.pool import PoolMeta
 from trytond.model import fields
-from trytond.pyson import Not, Bool, Eval, Equal
+from trytond.pyson import Not, Bool, Eval
 
 __all__ = ['Location']
 __metaclass__ = PoolMeta
