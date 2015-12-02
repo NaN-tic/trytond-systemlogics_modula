@@ -42,7 +42,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             'invisible': ~Eval('dbhost').in_(['xml']),
             'required': Eval('dbhost').in_(['xml']),
             },
-        depends=['state'])
+        depends=['dbhost'])
     active = fields.Boolean('Active', select=True)
     not_completed = fields.Char('Not completed',
         help='Not completed message')
