@@ -158,7 +158,15 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+
         <record model="ir.model.access" id="access_systemlogics_modula_exp_ordini_file">
+            <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_systemlogics_modula_exp_ordini_file_modula">
             <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
             <field name="group" ref="group_systemlogics_modula"/>
             <field name="perm_read" eval="True"/>
@@ -166,6 +174,5 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
-        <!-- End systemlogics -->
     </data>
 </tryton>
