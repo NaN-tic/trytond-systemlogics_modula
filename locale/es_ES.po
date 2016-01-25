@@ -150,10 +150,6 @@ msgctxt "help:systemlogics.modula,warehouse:"
 msgid "System Logics Warehouse"
 msgstr "Almacén SystemLogics Modula"
 
-msgctxt "model:ir.action,name:"
-msgid "SystemLogics"
-msgstr "SystemLogics"
-
 msgctxt "model:ir.action,name:act_systemlogics_modula_exp_ordini_file"
 msgid "SystemLogics Modula EXP Ordini Files"
 msgstr "Ficheros EXP Ordini Systemlogics Modula"
