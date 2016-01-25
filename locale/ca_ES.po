@@ -194,10 +194,6 @@ msgctxt "model:ir.trigger,name:trigger_export_ordini_file"
 msgid "SystemLogics Modula EXP Ordini File"
 msgstr "Fitxer EXP Ordini SystemLogics Modula"
 
-msgctxt "model:ir.ui.menu,name:"
-msgid "SystemLogics"
-msgstr "SystemLogics"
-
 msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"
