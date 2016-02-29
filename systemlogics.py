@@ -36,13 +36,13 @@ class SystemLogicsModula(ModelSQL, ModelView):
         ], 'DB Host', required=True)
     warehouse = fields.Many2One('stock.location', "Warehouse",
         domain=[('type', '=', 'warehouse')],
-        help='System Logics Warehouse')
+        help='System Logics Warehouse', required=True)
     path = fields.Char('Path',
         states={
             'invisible': ~Eval('dbhost').in_(['xml']),
             'required': Eval('dbhost').in_(['xml']),
             },
-        depends=['dbhost'])
+        depends=['dbhost'], required=True)
     active = fields.Boolean('Active', select=True)
     not_completed = fields.Char('Not completed',
         help='Not completed message')
@@ -57,6 +57,13 @@ class SystemLogicsModula(ModelSQL, ModelView):
     @staticmethod
     def default_dbhost():
         return 'xml'
+
+    @classmethod
+    def default_warehouse(cls):
+        Location = Pool().get('stock.location')
+        locations = Location.search(cls.warehouse.domain)
+        if locations:
+            return locations[0].id
 
     @staticmethod
     def default_path():
