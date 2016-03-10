@@ -141,7 +141,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
     def imp_ordini_xml(self, systemlogic, shipments, template, type_):
         tmpl = loader.load('%s.xml' % template)
 
-        dbname = Transaction().cursor.dbname
+        dbname = Transaction().database.name
 
         xml = tmpl.generate(systemlogic=systemlogic, shipments=shipments,
             type_=type_, datetime=datetime).render()
@@ -205,7 +205,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
     def imp_articoli_xml(self, systemlogic, products):
         tmpl = loader.load('IMP_ARTICOLI.xml')
 
-        dbname = Transaction().cursor.dbname
+        dbname = Transaction().database.name
 
         xml = tmpl.generate(products=products).render()
 
