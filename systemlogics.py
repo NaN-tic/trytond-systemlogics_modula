@@ -310,7 +310,7 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
         EXPOrdiniFile = pool.get('systemlogics.modula.exp.ordini.file')
 
         EXPOrdiniFile.write(ordini_files, {'state': 'in_progress'})
-        Transaction().cursor.commit()
+        Transaction().commit()
 
         to_do = []
         done_ordini_files = []

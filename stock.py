@@ -57,7 +57,7 @@ class ShipmentIn:
 
             # Force not get a rollback to generate XML file
             shipment_ids = [s.id for s in deposit_shipments]
-            Transaction().cursor.commit()
+            Transaction().commit()
             # Search shipment ID to sure not have a rollback
             shipments = cls.search([
                 ('id', 'in', shipment_ids),
@@ -128,7 +128,7 @@ class ShipmentOut:
 
             # Force not get a rollback to generate XML file
             shipment_ids = [s.id for s in (s_completed + s_incompleted)]
-            Transaction().cursor.commit()
+            Transaction().commit()
             # Search shipment ID to sure not have a rollback
             shipments = cls.search([
                 ('id', 'in', shipment_ids),
@@ -179,7 +179,7 @@ class ShipmentInternal:
             # Force not get a rollback to generate XML file
             extract_shipments_ids = [shipment.id for shipment in extract_shipments]
             deposit_shipments_ids = [shipment.id for shipment in deposit_shipments]
-            Transaction().cursor.commit()
+            Transaction().commit()
 
             if extract_shipments_ids:
                 # Search shipment ID to sure not have a rollback
