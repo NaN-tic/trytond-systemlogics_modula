@@ -6,10 +6,10 @@ from trytond.model import fields
 from trytond.pyson import Not, Bool, Eval
 
 __all__ = ['Location']
-__metaclass__ = PoolMeta
 
 
 class Location:
+    __metaclass__ = PoolMeta
     __name__ = 'stock.location'
     systemlogics_modula = fields.Boolean('SystemLogics Modula',
         states={

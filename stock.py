@@ -9,10 +9,10 @@ from trytond.wizard import Wizard, StateView, Button, StateTransition
 
 __all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal',
     'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
-__metaclass__ = PoolMeta
 
 
 class ShipmentIn:
+    __metaclass__ = PoolMeta
     __name__ = 'stock.shipment.in'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
@@ -72,6 +72,7 @@ class ShipmentIn:
 
 
 class ShipmentOut:
+    __metaclass__ = PoolMeta
     __name__ = 'stock.shipment.out'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
     systemlogics_modula_completed = fields.Boolean(
@@ -145,6 +146,7 @@ class ShipmentOut:
 
 
 class ShipmentInternal:
+    __metaclass__ = PoolMeta
     __name__ = 'stock.shipment.internal'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
