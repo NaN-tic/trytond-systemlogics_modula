@@ -7,7 +7,7 @@ from trytond.transaction import Transaction
 from trytond.pyson import Eval
 from trytond.wizard import Wizard, StateView, Button, StateTransition
 
-__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal',
+__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal', 'Move',
     'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
 __metaclass__ = PoolMeta
 
@@ -200,6 +200,15 @@ class ShipmentInternal:
     def assign(cls, shipments):
         super(ShipmentInternal, cls).assign(shipments)
         cls.generate_systemlogics_modula(shipments)
+
+
+class Move:
+    __name__ = 'stock.move'
+    modula_notes = fields.Function(fields.Char('Modula Notes'),
+        'get_modula_notes')
+
+    def get_modula_notes(self, name):
+        return
 
 
 class ShipmentOutSystemlogicsModulaExportStart(ModelView):

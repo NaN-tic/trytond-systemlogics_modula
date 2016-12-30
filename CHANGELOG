@@ -1,3 +1,4 @@
+* Add module notes field in stock move to custom in third modules
 * Save XML files in separated directories and the MODULA PATH defined in trytond cfg file
 
 Version 3.8.0 - 2015-11-11

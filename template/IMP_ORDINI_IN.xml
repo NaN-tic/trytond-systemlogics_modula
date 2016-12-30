@@ -19,7 +19,7 @@
       <RIG_HOSTINF>${move.id}</RIG_HOSTINF>
       <RIG_QTAR>${int(move.quantity)}</RIG_QTAR>
       <RIG_PRIO>0</RIG_PRIO>
-      <RIG_REQ_NOTE/>
+      <RIG_REQ_NOTE>${move.modula_notes}</RIG_REQ_NOTE>
     </IMP_ORDINI_RIGHE>
     </py:for>
   </IMP_ORDINI>
