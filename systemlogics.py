@@ -6,6 +6,7 @@ from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
 from trytond.transaction import Transaction
 from trytond.rpc import RPC
+from trytond.config import config as config_
 from itertools import groupby
 from xml.dom.minidom import parseString
 import genshi
@@ -23,6 +24,28 @@ loader = genshi.template.TemplateLoader(
     auto_reload=True)
 logger = logging.getLogger(__name__)
 
+MODULA_PATH = config_.get('systemlogics', 'modula', default='/tmp')
+MODULA_DIR = {
+    ('IMP_ORDINI_IN', 'V'): 'in',
+    ('IMP_ORDINI_OUT', 'P'): 'out',
+    ('IMP_ORDINI_IN', 'P'): 'internal',
+    ('IMP_ORDINI_INTERNAL', 'V'): 'internal',
+    ('IMP_ARTICOLI', None): 'product',
+    }
+
+def modula_directories():
+    'Create Modula directories'
+    for _, v in MODULA_DIR.iteritems():
+        dpath = MODULA_PATH + '/' + v
+        if not os.path.isdir(dpath):
+            os.mkdir(dpath)
+
+def get_modula_directory(template, type_=None):
+    mdir = MODULA_DIR.get((template, type_))
+    if mdir:
+        return MODULA_PATH + '/' + mdir
+    return MODULA_PATH
+
 
 class SystemLogicsModula(ModelSQL, ModelView):
     'SystemLogics Modula'
@@ -37,12 +60,6 @@ class SystemLogicsModula(ModelSQL, ModelView):
     warehouse = fields.Many2One('stock.location', "Warehouse",
         domain=[('type', '=', 'warehouse')],
         help='System Logics Warehouse', required=True)
-    path = fields.Char('Path',
-        states={
-            'invisible': ~Eval('dbhost').in_(['xml']),
-            'required': Eval('dbhost').in_(['xml']),
-            },
-        depends=['dbhost'], required=True)
     active = fields.Boolean('Active', select=True)
     not_completed = fields.Char('Not completed',
         help='Not completed message')
@@ -53,6 +70,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
         cls.__rpc__.update({
             'export_ordini_file': RPC(readonly=False),
             })
+        # create modula directories
+        modula_directories()
 
     @staticmethod
     def default_dbhost():
@@ -64,10 +83,6 @@ class SystemLogicsModula(ModelSQL, ModelView):
         locations = Location.search(cls.warehouse.domain)
         if locations:
             return locations[0].id
-
-    @staticmethod
-    def default_path():
-        return os.path.dirname(__file__)
 
     @staticmethod
     def default_active():
@@ -113,15 +128,6 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 return
 
             systemlogic, = systemlogics
-
-            if not os.path.isdir(systemlogic.path):
-                logger.warning(
-                    'Directory "%s" not exist (ID: %s)' % (
-                        systemlogic.path,
-                        systemlogic.id,
-                        ))
-                return
-
             ordini = getattr(self, 'imp_ordini_%s' % systemlogic.dbhost)
             ordini(systemlogic, shipments, template, type_)
 
@@ -147,7 +153,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             type_=type_, datetime=datetime).render()
 
         with tempfile.NamedTemporaryFile(
-                dir=systemlogic.path,
+                dir=get_modula_directory(template, type_),
                 prefix='%s-%s-' % (dbname,
                     datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
@@ -177,15 +183,6 @@ class SystemLogicsModula(ModelSQL, ModelView):
             return
 
         systemlogic, = systemlogics
-
-        if not os.path.isdir(systemlogic.path):
-            logger.warning(
-                'Directory "%s" not exist (ID: %s)' % (
-                    systemlogic.path,
-                    systemlogic.id,
-                    ))
-            return
-
         articoli = getattr(self, 'imp_articoli_%s' % systemlogic.dbhost)
         articoli(systemlogic, products)
 
@@ -210,7 +207,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
         xml = tmpl.generate(products=products).render()
 
         with tempfile.NamedTemporaryFile(
-                dir=systemlogic.path,
+                dir=get_modula_directory(template='IMP_ARTICOLI'),
                 prefix='%s-%s-' % (dbname,
                     datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
@@ -287,10 +284,10 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
             ('name_uniq', 'UNIQUE(name)', 'Name must be unique.'),
             ]
         cls._buttons.update({
-                'process_export_ordini': {
-                    'invisible': ~Eval('state').in_(['pending', 'failed']),
-                    },
-                })
+            'process_export_ordini': {
+                'invisible': ~Eval('state').in_(['pending', 'failed']),
+                },
+            })
 
     @classmethod
     def default_state(cls):
