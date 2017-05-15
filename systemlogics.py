@@ -26,25 +26,24 @@ logger = logging.getLogger(__name__)
 
 MODULA_PATH = config_.get('systemlogics', 'modula', default='/tmp')
 MODULA_DIR = {
-    ('IMP_ORDINI_IN', 'V'): 'in',
-    ('IMP_ORDINI_OUT', 'P'): 'out',
+    ('IMP_ORDINI_IN', 'V'): 'supplier-in',
+    ('IMP_ORDINI_OUT', 'P'): 'customer-out',
     ('IMP_ORDINI_IN', 'P'): 'internal',
     ('IMP_ORDINI_INTERNAL', 'V'): 'internal',
     ('IMP_ARTICOLI', None): 'product',
+    ('EXP_ORDINI_IN', None): 'supplier-in',
+    ('EXP_ORDINI_OUT', None): 'customer-out',
     }
 
-def modula_directories():
-    'Create Modula directories'
-    for _, v in MODULA_DIR.iteritems():
-        dpath = MODULA_PATH + '/' + v
-        if not os.path.isdir(dpath):
-            os.mkdir(dpath)
-
-def get_modula_directory(template, type_=None):
-    mdir = MODULA_DIR.get((template, type_))
-    if mdir:
-        return MODULA_PATH + '/' + mdir
-    return MODULA_PATH
+def get_modula_directory(template, warehouse=None, type_=None):
+    mdir = [MODULA_PATH]
+    if warehouse:
+        mdir.append(warehouse.code.lower() if warehouse.code else warehouse.id)
+    mdir.append(MODULA_DIR.get((template, type_)))
+    fmdir = '/'.join(mdir)
+    if not os.path.exists(fmdir):
+        os.makedirs(fmdir)
+    return fmdir
 
 
 class SystemLogicsModula(ModelSQL, ModelView):
@@ -68,10 +67,9 @@ class SystemLogicsModula(ModelSQL, ModelView):
     def __setup__(cls):
         super(SystemLogicsModula, cls).__setup__()
         cls.__rpc__.update({
-            'export_ordini_file': RPC(readonly=False),
+            'export_ordini_in_file': RPC(readonly=False),
+            'export_ordini_out_file': RPC(readonly=False),
             })
-        # create modula directories
-        modula_directories()
 
     @staticmethod
     def default_dbhost():
@@ -129,22 +127,22 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
             systemlogic, = systemlogics
             ordini = getattr(self, 'imp_ordini_%s' % systemlogic.dbhost)
-            ordini(systemlogic, shipments, template, type_)
+            ordini(systemlogic, shipments, warehouse, template, type_)
 
     @classmethod
-    def imp_ordini_odbc(self, systemlogic, shipments, template, type_):
+    def imp_ordini_odbc(self, systemlogic, shipments, warehouse, template, type_):
         logger.error('IMP_ORDINI ODBC not supported')
 
     @classmethod
-    def imp_ordini_ascii(self, systemlogic, shipments, template, type_):
+    def imp_ordini_ascii(self, systemlogic, shipments, warehouse, template, type_):
         logger.error('IMP_ORDINI ASCII not supported')
 
     @classmethod
-    def imp_ordini_excel(self, systemlogic, shipments, template, type_):
+    def imp_ordini_excel(self, systemlogic, shipments, warehouse, template, type_):
         logger.error('IMP_ORDINI EXCEL not supported')
 
     @classmethod
-    def imp_ordini_xml(self, systemlogic, shipments, template, type_):
+    def imp_ordini_xml(self, systemlogic, shipments, warehouse, template, type_):
         tmpl = loader.load('%s.xml' % template)
 
         dbname = Transaction().cursor.dbname
@@ -153,7 +151,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
             type_=type_, datetime=datetime).render()
 
         with tempfile.NamedTemporaryFile(
-                dir=get_modula_directory(template, type_),
+                dir=get_modula_directory(template, warehouse, type_),
                 prefix='%s-%s-' % (dbname,
                     datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                 suffix='.xml', delete=False) as temp:
@@ -216,10 +214,10 @@ class SystemLogicsModula(ModelSQL, ModelView):
         temp.close()
 
     @classmethod
-    def export_ordini_file(cls, args=None):
+    def export_ordini_in_file(cls, args=None):
         EXPOrdiniFile = Pool().get('systemlogics.modula.exp.ordini.file')
 
-        logger.info('Start read SystemLogics Module files')
+        logger.info('Start read SystemLogics In Module files')
 
         modulas = cls.search([
                 ('name', '=', 'EXP_ORDINI'),
@@ -228,8 +226,11 @@ class SystemLogicsModula(ModelSQL, ModelView):
         vlist = []
         to_delete = []
         for modula in modulas:
+            path = get_modula_directory(
+                template='EXP_ORDINI_IN',
+                warehouse=modula.warehouse)
             try:
-                filenames = os.listdir(modula.path)
+                filenames = os.listdir(path)
             except OSError, e:
                 logger.warning('Error reading path: %s' % e)
                 continue
@@ -238,29 +239,90 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 values = {}
                 exp_ordini_file = EXPOrdiniFile.search([
                         ('name', '=', filename)
-                        ])
+                        ], limit=1)
                 if exp_ordini_file:
                     to_delete.append(fullname)
                     continue
+
                 try:
                     content = open(fullname, 'r').read()
                 except IOError, e:
                     logger.warning('Error reading file %s: %s' % (fullname, e))
                     continue
+
                 values['name'] = filename
                 values['modula'] = modula.id
                 values['content'] = content
                 values['state'] = 'pending'
+                values['state'] = 'in'
                 vlist.append(values)
                 to_delete.append(fullname)
+
         ordini_files = EXPOrdiniFile.create(vlist)
-        EXPOrdiniFile.process_export_ordini(ordini_files)
+        EXPOrdiniFile.process_export_in_ordini(ordini_files)
+
         for filename in to_delete:
             try:
                 os.remove(filename)
             except OSError:
                 pass
-        logger.info('Loaded SystemLogics Module %s files' % (len(to_delete)))
+        logger.info('Loaded SystemLogics In Module %s files' % (len(to_delete)))
+
+
+    @classmethod
+    def export_ordini_out_file(cls, args=None):
+        EXPOrdiniFile = Pool().get('systemlogics.modula.exp.ordini.file')
+
+        logger.info('Start read SystemLogics Out Module files')
+
+        modulas = cls.search([
+                ('name', '=', 'EXP_ORDINI'),
+                ])
+
+        vlist = []
+        to_delete = []
+        for modula in modulas:
+            path = get_modula_directory(
+                template='EXP_ORDINI_IN',
+                warehouse=modula.warehouse)
+            try:
+                filenames = os.listdir(path)
+            except OSError, e:
+                logger.warning('Error reading path: %s' % e)
+                continue
+            for filename in filenames:
+                fullname = '%s/%s' % (modula.path, filename)
+                values = {}
+                exp_ordini_file = EXPOrdiniFile.search([
+                        ('name', '=', filename)
+                        ], limit=1)
+                if exp_ordini_file:
+                    to_delete.append(fullname)
+                    continue
+
+                try:
+                    content = open(fullname, 'r').read()
+                except IOError, e:
+                    logger.warning('Error reading file %s: %s' % (fullname, e))
+                    continue
+
+                values['name'] = filename
+                values['modula'] = modula.id
+                values['content'] = content
+                values['state'] = 'pending'
+                values['state'] = 'out'
+                vlist.append(values)
+                to_delete.append(fullname)
+
+        ordini_files = EXPOrdiniFile.create(vlist)
+        EXPOrdiniFile.process_export_out_ordini(ordini_files)
+
+        for filename in to_delete:
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+        logger.info('Loaded SystemLogics Out Module %s files' % (len(to_delete)))
 
 
 class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
@@ -270,6 +332,10 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
     modula = fields.Many2One('systemlogics.modula', "Systemlogics Modula",
         required=True)
     content = fields.Text('Content', readonly=True)
+    type_ = fields.Selection([
+        ('in', 'In'),
+        ('out', 'Out'),
+        ], 'Type', required=True, readonly=True)
     state = fields.Selection([
         ('pending', 'Pending'),
         ('in_progress', 'In progress'),
@@ -284,10 +350,19 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
             ('name_uniq', 'UNIQUE(name)', 'Name must be unique.'),
             ]
         cls._buttons.update({
-            'process_export_ordini': {
-                'invisible': ~Eval('state').in_(['pending', 'failed']),
+            'process_export_in_ordini': {
+                'invisible': (Eval('state').in_(['in_progress', 'done'])
+                    & (Eval('type_') == 'in')) | (Eval('type_') == 'out'),
+                },
+            'process_export_out_ordini': {
+                'invisible': (Eval('state').in_(['in_progress', 'done'])
+                    & (Eval('type_') == 'out')) | (Eval('type_') == 'in'),
                 },
             })
+
+    @classmethod
+    def default_type_(cls):
+        return 'in'
 
     @classmethod
     def default_state(cls):
@@ -295,7 +370,7 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
-    def process_export_ordini(cls, ordini_files, trigger=None):
+    def process_export_in_ordini(cls, ordini_files, trigger=None):
         ''''
         Read EXP ORDINI file
         1- Try to done a move (RIG_HOSTINF is ID move)
@@ -348,17 +423,87 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
             Shipment._sync_inventory_to_outgoing(shipments)
             Move.assign([m for s in shipments for m in s.outgoing_moves])
 
-        to_package = []
-        for shipment in shipments:
-            package = True
-            for move in shipment.outgoing_moves:
-                if move.state != 'assigned':
-                    package = False
-            if package:
-                to_package.append(shipment)
+            to_package = []
+            for shipment in shipments:
+                package = True
+                for move in shipment.outgoing_moves:
+                    if move.state != 'assigned':
+                        package = False
+                if package:
+                    to_package.append(shipment)
 
-        if to_package:
-            Shipment.pack(to_package)
+            if to_package:
+                Shipment.pack(to_package)
+
+        if done_ordini_files:
+            cls.write(done_ordini_files, {'state': 'done'})
+        if fail_ordini_files:
+            cls.write(fail_ordini_files, {'state': 'failed'})
+
+    @classmethod
+    def process_export_out_ordini(cls, ordini_files, trigger=None):
+        ''''
+        Read EXP ORDINI file
+        1- Try to done a move (RIG_HOSTINF is ID move)
+        2- Try to done shipment if all moves are done
+        '''
+        pool = Pool()
+        Move = pool.get('stock.move')
+        Shipment = pool.get('stock.shipment.in')
+        EXPOrdiniFile = pool.get('systemlogics.modula.exp.ordini.file')
+
+        EXPOrdiniFile.write(ordini_files, {'state': 'in_progress'})
+        Transaction().cursor.commit()
+
+        to_do = []
+        done_ordini_files = []
+        fail_ordini_files = []
+        shipments = set()
+        for ofile in ordini_files:
+            try:
+                dom = parseString(ofile.content)
+            except:
+                fail_ordini_files.append(ofile)
+                continue
+
+            quantities = {}
+            moves = []
+            for o in dom.getElementsByTagName('EXP_ORDINI_RIGHE'):
+                move = {}
+                id_ = (o.getElementsByTagName('RIG_HOSTINF')[0]
+                    .firstChild.data)
+                moves.append(id_)
+                quantities[int(id_)] = float(
+                    o.getElementsByTagName('RIG_QTAE')
+                    [0].firstChild.data.replace(',', '.'))
+
+            moves = Move.search([
+                    ('id', 'in', moves)
+                    ])
+            for move in moves:
+                if (quantities[move.id] == move.quantity
+                        and move.shipment.state == 'received'):
+                    to_do.append(move)
+                    shipments.add(move.shipment)
+            done_ordini_files.append(ofile)
+
+        if to_do:
+            Move.do(to_do) # TODO try/except move error
+
+        if shipments:
+            Move.assign([m for s in shipments for m in s.inventory_moves])
+
+            to_done = []
+            for shipment in shipments:
+                done = True
+                for move in shipment.inventory_moves:
+                    if move.state != 'done':
+                        done = False
+                if done:
+                    to_done.append(shipment)
+
+            if to_done:
+                Shipment.done(to_done)
 
         if done_ordini_files:
             cls.write(done_ordini_files, {'state': 'done'})

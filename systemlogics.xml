@@ -117,8 +117,8 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             name="EXP Ordini Files"/>
 
         <!-- CRON for systemlogics.modula -->
-        <record model="ir.cron" id="cron_export_ordini_file">
-            <field name="name">Export Ordini Files</field>
+        <record model="ir.cron" id="cron_export_ordini_in_file">
+            <field name="name">Export Ordini In Files</field>
             <field name="request_user" ref="res.user_admin"/>
             <field name="user" ref="res.user_trigger"/>
             <field name="active" eval="True"/>
@@ -127,7 +127,19 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="number_calls">-1</field>
             <field name="repeat_missed" eval="False"/>
             <field name="model">systemlogics.modula</field>
-            <field name="function">export_ordini_file</field>
+            <field name="function">export_ordini_in_file</field>
+        </record>
+        <record model="ir.cron" id="cron_export_ordini_out_file">
+            <field name="name">Export Ordini Out Files</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="res.user_trigger"/>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="number_calls">-1</field>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">systemlogics.modula</field>
+            <field name="function">export_ordini_out_file</field>
         </record>
 
         <!-- Trigger for systemlogics.modula -->

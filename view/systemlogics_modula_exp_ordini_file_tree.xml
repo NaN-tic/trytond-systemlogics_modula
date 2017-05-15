@@ -4,6 +4,8 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
 <tree string="SystemLogics">
     <field name="name"/>
     <field name="modula"/>
+    <field name="type_"/>
     <field name="state"/>
-    <button name="process_export_ordini" string="Process" tree_invisible="1"/>
+    <button name="process_export_in_ordini" string="Process In" tree_invisible="1"/>
+    <button name="process_export_out_ordini" string="Process Out" tree_invisible="1"/>
 </tree>
