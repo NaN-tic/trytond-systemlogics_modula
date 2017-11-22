@@ -82,7 +82,8 @@ class SystemLogicsModula(ModelSQL, ModelView):
         Location = Pool().get('stock.location')
         shipments_ordini = []
         for shipment in shipments:
-            if shipment.__name__ == 'stock.shipment.in':
+            if shipment.__name__ in [
+                    'stock.shipment.in', 'stock.shipment.out.return']:
                 if shipment.state not in ['received', 'done']:
                     continue
             else:

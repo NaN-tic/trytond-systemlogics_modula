@@ -7,10 +7,10 @@ from trytond.wizard import Wizard, StateTransition, StateView, Button
 from trytond.transaction import Transaction
 
 __all__ = ['Product', 'SystemlogicsModulaArticoli', 'SystemlogicsModulaArticoliResult']
-__metaclass__ = PoolMeta
 
 
 class Product:
+    __metaclass__ = PoolMeta
     __name__ = 'product.product'
 
     @classmethod
