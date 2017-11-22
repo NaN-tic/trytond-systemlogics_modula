@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <SYSTORE_ORDINI xmlns:py="http://genshi.edgewall.org/">
   <IMP_ORDINI py:for="shipment in shipments">
-    <ORD_ORDINE>${shipment.code}</ORD_ORDINE>
+    <ORD_ORDINE>${shipment.number}</ORD_ORDINE>
     <ORD_DES>${shipment.reference and shipment.reference[:50]}</ORD_DES>
     <ORD_TIPOOP>${type_}</ORD_TIPOOP> <!-- P: Extracion / V: Deposito -->
     <ORD_PRIOHOST>${datetime.datetime.now().strftime("%Y%m%d%H%M%s")[:16]}</ORD_PRIOHOST> <!-- fechaHora AAAAMMGGHHPPPPPP -->
@@ -9,7 +9,7 @@
     <ORD_SPEDIZIONE></ORD_SPEDIZIONE>
     <ORD_GEST_PKL></ORD_GEST_PKL>
     <IMP_ORDINI_RIGHE py:for="move in shipment.moves">
-      <RIG_ORDINE>${shipment.code}</RIG_ORDINE>
+      <RIG_ORDINE>${shipment.number}</RIG_ORDINE>
       <RIG_ARTICOLO>${move.product.code or move.product.rec_name}</RIG_ARTICOLO>
       <RIG_SUB1/>
       <RIG_SUB2/>

@@ -7,7 +7,7 @@ from trytond.transaction import Transaction
 from trytond.pyson import Eval
 from trytond.wizard import Wizard, StateView, Button, StateTransition
 
-__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentInternal',
+__all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentOutReturn', 'ShipmentInternal',
     'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
 
 
@@ -143,6 +143,66 @@ class ShipmentOut:
         # control generate systemlogics module with context
         if Transaction().context.get('generate_systemlogics_modula', True):
             cls.generate_systemlogics_modula(shipments)
+
+
+class ShipmentOutReturn:
+    __metaclass__ = PoolMeta
+    __name__ = 'stock.shipment.out.return'
+    systemlogics_modula = fields.Boolean('SystemLogics Modula')
+
+    @classmethod
+    def __setup__(cls):
+        super(ShipmentOutReturn, cls).__setup__()
+        cls._buttons.update({
+            'do_systemlogics_modula': {
+                'invisible': Eval('state').in_(['draft', 'cancel']),
+                },
+            })
+
+    @staticmethod
+    def default_systemlogics_modula():
+        return False
+
+    @classmethod
+    def copy(cls, shipments, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['systemlogics_modula'] = None
+        return super(ShipmentOutReturn, cls).copy(shipments, default=default)
+
+    @classmethod
+    def generate_systemlogics_modula(cls, shipments):
+        '''Active System Logics process when a move location is systemlogics marked'''
+        SystemLogicsModula = Pool().get('systemlogics.modula')
+
+        deposit_shipments = []
+        for s in shipments:
+            systemLogics = False
+            for move in s.inventory_moves:
+                if move.to_location.systemlogics_modula:
+                    systemLogics = True
+
+            if systemLogics:
+                deposit_shipments.append(s)
+
+        if deposit_shipments:
+            cls.write(deposit_shipments, {'systemlogics_modula': True})
+
+            # Force not get a rollback to generate XML file
+            shipment_ids = [s.id for s in deposit_shipments]
+            Transaction().commit()
+            # Search shipment ID to sure not have a rollback
+            shipments = cls.search([
+                ('id', 'in', shipment_ids),
+                ])
+            SystemLogicsModula.imp_ordini(
+                shipments, template='IMP_ORDINI_IN', type_='V')
+
+    @classmethod
+    @ModelView.button
+    def do_systemlogics_modula(cls, shipments):
+        cls.generate_systemlogics_modula(shipments)
 
 
 class ShipmentInternal:
