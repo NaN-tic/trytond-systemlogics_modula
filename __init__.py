@@ -2,24 +2,25 @@
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
 from trytond.pool import Pool
-from .systemlogics import *
-from .location import *
-from .product import *
-from .stock import *
+from . import systemlogics
+from . import location
+from . import product
+from . import stock
 
 def register():
     Pool.register(
-        SystemLogicsModula,
-        SystemLogicsModulaEXPOrdiniFile,
-        Location,
-        Product,
-        ShipmentIn,
-        ShipmentOut,
-        ShipmentOutSystemlogicsModulaExportStart,
-        ShipmentInternal,
-        SystemlogicsModulaArticoliResult,
+        systemlogics.SystemLogicsModula,
+        systemlogics.SystemLogicsModulaEXPOrdiniFile,
+        location.Location,
+        product.Product,
+        stock.ShipmentIn,
+        stock.ShipmentOut,
+        stock.ShipmentOutReturn,
+        stock.ShipmentOutSystemlogicsModulaExportStart,
+        stock.ShipmentInternal,
+        product.SystemlogicsModulaArticoliResult,
         module='systemlogics_modula', type_='model')
     Pool.register(
-        ShipmentOutSystemlogicsModulaExport,
-        SystemlogicsModulaArticoli,
+        stock.ShipmentOutSystemlogicsModulaExport,
+        product.SystemlogicsModulaArticoli,
         module='systemlogics_modula', type_='wizard')
