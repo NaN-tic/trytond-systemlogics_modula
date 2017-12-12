@@ -6,6 +6,7 @@ from . import systemlogics
 from . import location
 from . import product
 from . import stock
+from . import configuration
 
 def register():
     Pool.register(
@@ -19,6 +20,7 @@ def register():
         stock.ShipmentOutSystemlogicsModulaExportStart,
         stock.ShipmentInternal,
         product.SystemlogicsModulaArticoliResult,
+        configuration.Configuration,
         module='systemlogics_modula', type_='model')
     Pool.register(
         stock.ShipmentOutSystemlogicsModulaExport,
