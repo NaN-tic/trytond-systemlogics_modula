@@ -10,7 +10,8 @@ from trytond.tools import grouped_slice
 import logging
 
 __all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentOutReturn', 'ShipmentInternal',
-    'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
+    'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport',
+    'ShipmentOutSystemlogicsModulaCheckStart', 'ShipmentOutSystemlogicsModulaCheck']
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +137,7 @@ class ShipmentOut:
         s_completed = [] # shipments completed
         s_incompleted = [] # shipments incompleted
         for s in shipments:
+            print "------- s:", s
             if hasattr(s, 'review'):
                 if s.review:
                     continue
@@ -151,19 +153,19 @@ class ShipmentOut:
                     s_completed.append(s)
                 else:
                     s_incompleted.append(s)
+        print "------- s_completed:", s_completed
+        print "------- s_incompleted:", s_incompleted
+        value = {
+	    'systemlogics_modula': True,
+	    'systemlogics_modula_sended': False,
+        }
         if s_completed or s_incompleted:
             if s_completed:
-                cls.write(s_completed, {
-                    'systemlogics_modula': True,
-                    'systemlogics_modula_sended': False,
-                    'systemlogics_modula_completed': True,
-                    })
+                value['systemlogics_modula_completed'] = True
+                cls.write(s_completed, value)
             if s_incompleted:
-                cls.write(s_incompleted, {
-                    'systemlogics_modula': True,
-                    'systemlogics_modula_sended': False,
-                    'systemlogics_modula_completed': False,
-                    })
+                value['systemlogics_modula_completed'] = False
+                cls.write(s_incompleted, value)
 
         config = Configuration(1)
         if config.try_generate_systemlogics_modula and (
@@ -174,8 +176,8 @@ class ShipmentOut:
     @classmethod
     def assign(cls, shipments):
         super(ShipmentOut, cls).assign(shipments)
-        cls.generate_systemlogics_modula(shipments)
-
+        assigned = [s for s in shipments if s.state == 'assigned']
+        cls.generate_systemlogics_modula(assigned)
 
     @classmethod
     def generate_systemlogics_modula_scheduler(cls, args=None):
@@ -365,7 +367,7 @@ class ShipmentOutSystemlogicsModulaExportStart(ModelView):
             values.append(
                 ('id', 'in', active_ids)
                 )
-        shipments =  ShipmentOut.search(values)
+        shipments = ShipmentOut.search(values)
         return [s.id for s in shipments]
 
 
@@ -386,4 +388,52 @@ class ShipmentOutSystemlogicsModulaExport(Wizard):
         shipments = list(self.start.shipments)
         if shipments:
             ShipmentOut.generate_systemlogics_modula_file(shipments)
+        return 'end'
+
+
+class ShipmentOutSystemlogicsModulaCheckStart(ModelView):
+    'Customer shipments check Systemlogics Modula Start'
+    __name__ = 'stock.shipment.out.systemlogics.modula.check.start'
+    shipments = fields.Many2Many('stock.shipment.out', None, None, 'Shipments',
+        domain=[
+            ('state', '=', 'assigned'),
+            ],
+        states={
+            'required': True,
+            },
+        help='Assigned customer shipments to check Systemlogics Modula.')
+
+    @staticmethod
+    def default_shipments():
+        ShipmentOut = Pool().get('stock.shipment.out')
+
+        active_ids = Transaction().context.get('active_ids', [])
+        values = [
+            ('state', '=', 'assigned'),
+            ]
+        if active_ids:
+            values.append(
+                ('id', 'in', active_ids)
+                )
+        shipments = ShipmentOut.search(values)
+        return [s.id for s in shipments]
+
+
+class ShipmentOutSystemlogicsModulaCheck(Wizard):
+    'Customer shipments check Systemlogics Modula'
+    __name__ = 'stock.shipment.out.systemlogics.modula.check'
+
+    start = StateView('stock.shipment.out.systemlogics.modula.check.start',
+        'systemlogics_modula.shipment_out_check_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Check', 'check', 'tryton-ok', True),
+            ])
+    check = StateTransition()
+
+    def transition_check(self):
+        ShipmentOut = Pool().get('stock.shipment.out')
+
+        shipments = list(self.start.shipments)
+        if shipments:
+            ShipmentOut.generate_systemlogics_modula(shipments)
         return 'end'

@@ -18,11 +18,13 @@ def register():
         stock.ShipmentOut,
         stock.ShipmentOutReturn,
         stock.ShipmentOutSystemlogicsModulaExportStart,
+        stock.ShipmentOutSystemlogicsModulaCheckStart,
         stock.ShipmentInternal,
         product.SystemlogicsModulaArticoliResult,
         configuration.Configuration,
         module='systemlogics_modula', type_='model')
     Pool.register(
         stock.ShipmentOutSystemlogicsModulaExport,
+        stock.ShipmentOutSystemlogicsModulaCheck,
         product.SystemlogicsModulaArticoli,
         module='systemlogics_modula', type_='wizard')

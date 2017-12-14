@@ -40,6 +40,29 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
+        <!-- stock.shipment.out check wizard -->
+        <record model="ir.ui.view" id="shipment_out_check_form">
+            <field name="model">stock.shipment.out.systemlogics.modula.check.start</field>
+            <field name="type">form</field>
+            <field name="name">shipment_out_check_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_shipment_out_check">
+            <field name="name">Check Systemlogics Modula</field>
+            <field name="wiz_name">stock.shipment.out.systemlogics.modula.check</field>
+            <field name="model">stock.shipment.out</field>
+        </record>
+        <record model="ir.action.keyword" id="shipment_out_check_keyword">
+            <field name="keyword">form_action</field>
+            <field name="model">stock.shipment.out,-1</field>
+            <field name="action" ref="wizard_shipment_out_check"/>
+        </record>
+        <record model="ir.action-res.group"
+            id="action_group_wizard_shipment_out_check">
+            <field name="action" ref="wizard_shipment_out_check"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
+
         <!-- user cron shipment out generate systemlogics modula -->
         <record model="res.user" id="user_stock_generate_systemlogics_modula">
             <field name="login">user_stock_generate_systemlogics_modula</field>
