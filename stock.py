@@ -358,16 +358,16 @@ class ShipmentOutSystemlogicsModulaExportStart(ModelView):
         ShipmentOut = Pool().get('stock.shipment.out')
 
         active_ids = Transaction().context.get('active_ids', [])
-        values = [
+        domain = [
             ('state', '=', 'assigned'),
             ('systemlogics_modula', '=', True),
             ('systemlogics_modula_sended', '=', False),
             ]
         if active_ids:
-            values.append(
+            domain.append(
                 ('id', 'in', active_ids)
                 )
-        shipments = ShipmentOut.search(values)
+        shipments = ShipmentOut.search(domain)
         return [s.id for s in shipments]
 
 
@@ -408,14 +408,14 @@ class ShipmentOutSystemlogicsModulaCheckStart(ModelView):
         ShipmentOut = Pool().get('stock.shipment.out')
 
         active_ids = Transaction().context.get('active_ids', [])
-        values = [
+        domain = [
             ('state', '=', 'assigned'),
             ]
         if active_ids:
-            values.append(
+            domain.append(
                 ('id', 'in', active_ids)
                 )
-        shipments = ShipmentOut.search(values)
+        shipments = ShipmentOut.search(domain)
         return [s.id for s in shipments]
 
 
