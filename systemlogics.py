@@ -339,6 +339,9 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
                     ('id', 'in', moves)
                     ])
             for move in moves:
+                # TODO process shipment out and internal
+                if not move.shipment or move.shipment.__class__ != 'stock.shipment.out':
+                    continue
                 if (quantities[move.id] == move.quantity
                         and move.shipment.state == 'assigned'):
                     to_do.append(move)
