@@ -324,7 +324,7 @@ class ShipmentInternal:
                     ('id', 'in', extract_shipments_ids),
                     ])
                 SystemLogicsModula.imp_ordini(
-                    ext_shipments, template='IMP_ORDINI_IN', type_='P')
+                    ext_shipments, template='IMP_ORDINI_INTERNAL', type_='P')
             if deposit_shipments_ids:
                 # Search shipment ID to sure not have a rollback
                 dep_shipments = cls.search([
