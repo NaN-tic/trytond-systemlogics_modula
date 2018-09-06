@@ -19,6 +19,22 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
+        <!-- systemlogics.user -->
+        <record model="res.user" id="user_systemlogics_modula">
+            <field name="login">user_cron_internal_systemlogics_modula</field>
+            <field name="name">Cron SystemLogics Modula</field>
+            <field name="signature"></field>
+            <field name="active" eval="False"/>
+        </record>
+        <record model="res.user-res.group" id="user_systemlogics_modula_admin_group">
+            <field name="user" ref="user_systemlogics_modula"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
+        <record model="res.user-res.group" id="user_systemlogics_modula_stock_admin_group">
+            <field name="user" ref="user_systemlogics_modula"/>
+            <field name="group" ref="stock.group_stock_admin"/>
+        </record>
+
         <!-- Menus -->
         <menuitem parent="stock.menu_configuration"
             name="SystemLogics Modula" id="menu_systemlogics_modula_configuration"/>
@@ -110,17 +126,37 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="act_window" ref="act_systemlogics_modula_exp_ordini_file"/>
         </record>
 
-        <menuitem
-            id="menu_systemlogics_modula_exp_ordini_file"
-            parent="menu_systemlogics_modula"
-            action="act_systemlogics_modula_exp_ordini_file"
-            name="EXP Ordini Files"/>
+        <menuitem id="menu_systemlogics_modula_exp_ordini_file" parent="menu_systemlogics_modula"
+            action="act_systemlogics_modula_exp_ordini_file" name="EXP Ordini Files"/>
+        <record model="ir.ui.menu-res.group" id="menu_systemlogics_exp_ordini_file_group_modula">
+            <field name="menu" ref="menu_systemlogics_modula_exp_ordini_file"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
+
+        <!-- Import EXP Ordini File -->
+        <record model="ir.ui.view" id="systemlogics_modula_import_exp_ordini_file_start">
+            <field name="model">systemlogics.modula.import.exp.ordini.file.start</field>
+            <field name="type">form</field>
+            <field name="name">systemlogics_modula_import_exp_ordini_file_start</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_systemlogics_modula_import_exp_ordini_file_start">
+            <field name="name">Import EXP Ordini File</field>
+            <field name="wiz_name">systemlogics.modula.import.exp.ordini.file</field>
+        </record>
+        <menuitem id="menu_systemlogics_modula_import_exp_ordini_file" parent="menu_systemlogics_modula_exp_ordini_file"
+            action="wizard_systemlogics_modula_import_exp_ordini_file_start" name="Import Export Ordini Files"
+            sequence="20"/>
+        <record model="ir.ui.menu-res.group" id="menu_systemlogics_modula_exp_ordini_file_group_modula">
+            <field name="menu" ref="menu_systemlogics_modula_import_exp_ordini_file"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
 
         <!-- CRON for systemlogics.modula -->
         <record model="ir.cron" id="cron_export_ordini_file">
             <field name="name">Export Ordini Files</field>
             <field name="request_user" ref="res.user_admin"/>
-            <field name="user" ref="res.user_trigger"/>
+            <field name="user" ref="user_systemlogics_modula"/>
             <field name="active" eval="True"/>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>

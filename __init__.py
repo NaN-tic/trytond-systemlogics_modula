@@ -12,6 +12,7 @@ def register():
     Pool.register(
         systemlogics.SystemLogicsModula,
         systemlogics.SystemLogicsModulaEXPOrdiniFile,
+        systemlogics.SystemLogicsModulaImportEXPOrdiniFileStart,
         location.Location,
         product.Product,
         stock.ShipmentIn,
@@ -24,6 +25,7 @@ def register():
         configuration.Configuration,
         module='systemlogics_modula', type_='model')
     Pool.register(
+        systemlogics.SystemLogicsModulaImportEXPOrdiniFile,
         stock.ShipmentOutSystemlogicsModulaExport,
         stock.ShipmentOutSystemlogicsModulaCheck,
         product.SystemlogicsModulaArticoli,

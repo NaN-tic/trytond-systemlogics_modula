@@ -113,14 +113,12 @@ class ShipmentOut:
 
     @classmethod
     def generate_systemlogics_modula_file(cls, shipments):
-        pool = Pool()
-        SystemLogicsModula = pool.get('systemlogics.modula')
-        cls.write(shipments, {
-            'systemlogics_modula_sended': True,
-            })
+        SystemLogicsModula = Pool().get('systemlogics.modula')
+
         # Force not get a rollback to generate XML file
         shipment_ids = [s.id for s in shipments]
         Transaction().cursor.commit()
+
         # Search shipment ID to sure not have a rollback
         shipments = cls.search([
             ('id', 'in', shipment_ids),
@@ -130,48 +128,43 @@ class ShipmentOut:
 
     @classmethod
     def generate_systemlogics_modula(cls, shipments):
-        '''Active System Logics process when a move from location is systemlogics marked'''
-        pool = Pool()
-        Configuration = pool.get('stock.configuration')
+        '''Generate SystemLogics Modula'''
+        Configuration = Pool().get('stock.configuration')
 
-        s_completed = [] # shipments completed
-        s_incompleted = [] # shipments incompleted
-        for s in shipments:
-            print "------- s:", s
-            if hasattr(s, 'review'):
-                if s.review:
+        config = Configuration(1)
+        if not (Transaction().context.get('generate_systemlogics_modula',
+                config.try_generate_systemlogics_modula)):
+            return
+
+        to_write = []
+        shipments_modula = []
+        value = {
+    	    'systemlogics_modula': True,
+            'systemlogics_modula_sended': True
+            }
+        for shipment in shipments:
+            if hasattr(shipment, 'review'):
+                if shipment.review:
                     continue
             systemLogics = False
             completed = True
-            for move in s.inventory_moves:
+            for move in shipment.inventory_moves:
                 if move.from_location.systemlogics_modula:
                     systemLogics = True
                 else:
                     completed = False
             if systemLogics:
+                shipments_modula.append(shipment)
                 if completed:
-                    s_completed.append(s)
+                    value['systemlogics_modula_completed'] = True
+                    to_write.extend(([shipment], value))
                 else:
-                    s_incompleted.append(s)
-        print "------- s_completed:", s_completed
-        print "------- s_incompleted:", s_incompleted
-        value = {
-	    'systemlogics_modula': True,
-	    'systemlogics_modula_sended': False,
-        }
-        if s_completed or s_incompleted:
-            if s_completed:
-                value['systemlogics_modula_completed'] = True
-                cls.write(s_completed, value)
-            if s_incompleted:
-                value['systemlogics_modula_completed'] = False
-                cls.write(s_incompleted, value)
+                    value['systemlogics_modula_completed'] = False
+                    to_write.extend(([shipment], value))
 
-        config = Configuration(1)
-        if config.try_generate_systemlogics_modula and (
-                s_completed or s_incompleted):
-            cls.generate_systemlogics_modula_file(
-                s_completed.extend(s_incompleted))
+        if shipments_modula:
+            cls.write(*to_write)
+            cls.generate_systemlogics_modula_file(shipments_modula)
 
     @classmethod
     def assign(cls, shipments):
@@ -196,9 +189,8 @@ class ShipmentOut:
             ]
         if args:
             domain.append(
-                ('id', 'in', args),
+                ('warehouse', 'in', args),
                 )
-
         shipments = cls.search(domain)
 
         len_ships = len(shipments)
@@ -209,14 +201,14 @@ class ShipmentOut:
             blocs = 1
             slice_systemlogics_modula = (config.slice_systemlogics_modula or
                 len_ships)
-            for sub_shipments in grouped_slice(shipments,
-                    slice_systemlogics_modula):
-                logger.info('Start bloc %s of %s.' % (
-                        blocs, len_ships/slice_systemlogics_modula))
-                ships = cls.browse(sub_shipments)
-                cls.generate_systemlogics_modula_file(ships)
-                logger.info('End bloc %s.' % blocs)
-                blocs += 1
+            with Transaction().set_context(generate_systemlogics_modula=True):
+                for sub_shipments in grouped_slice(shipments,
+                        slice_systemlogics_modula):
+                    logger.info('Start bloc %s of %s.' % (
+                            blocs, len_ships/slice_systemlogics_modula))
+                    cls.generate_systemlogics_modula(list(sub_shipments))
+                    logger.info('End bloc %s.' % blocs)
+                    blocs += 1
         logger.info('End Scheduler Try generate Systemlogics Modula.')
 
 
@@ -343,26 +335,20 @@ class ShipmentOutSystemlogicsModulaExportStart(ModelView):
     'Customer shipments export Systemlogics Modula Start'
     __name__ = 'stock.shipment.out.systemlogics.modula.export.start'
     shipments = fields.Many2Many('stock.shipment.out', None, None, 'Shipments',
-        domain=[
+        required=True, domain=[
             ('state', '=', 'assigned'),
             ('systemlogics_modula', '=', True),
             ('systemlogics_modula_sended', '=', False),
             ],
-        states={
-            'required': True,
-            },
         help='Assigned customer shipments to export Systemlogics Modula.')
 
-    @staticmethod
-    def default_shipments():
+    @classmethod
+    def default_shipments(cls):
         ShipmentOut = Pool().get('stock.shipment.out')
 
         active_ids = Transaction().context.get('active_ids', [])
-        domain = [
-            ('state', '=', 'assigned'),
-            ('systemlogics_modula', '=', True),
-            ('systemlogics_modula_sended', '=', False),
-            ]
+        domain = []
+        domain.extend(cls.shipments.domain)
         if active_ids:
             domain.append(
                 ('id', 'in', active_ids)
@@ -387,7 +373,8 @@ class ShipmentOutSystemlogicsModulaExport(Wizard):
 
         shipments = list(self.start.shipments)
         if shipments:
-            ShipmentOut.generate_systemlogics_modula_file(shipments)
+            with Transaction().set_context(generate_systemlogics_modula=True):
+                ShipmentOut.generate_systemlogics_modula(shipments)
         return 'end'
 
 
@@ -395,12 +382,9 @@ class ShipmentOutSystemlogicsModulaCheckStart(ModelView):
     'Customer shipments check Systemlogics Modula Start'
     __name__ = 'stock.shipment.out.systemlogics.modula.check.start'
     shipments = fields.Many2Many('stock.shipment.out', None, None, 'Shipments',
-        domain=[
+        required=True, domain=[
             ('state', '=', 'assigned'),
             ],
-        states={
-            'required': True,
-            },
         help='Assigned customer shipments to check Systemlogics Modula.')
 
     @staticmethod

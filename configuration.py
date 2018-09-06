@@ -20,7 +20,7 @@ class Configuration:
 
     @staticmethod
     def default_try_generate_systemlogics_modula():
-        return False
+        return True
 
     @staticmethod
     def default_slice_systemlogics_modula():

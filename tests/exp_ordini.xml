@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="yes"?>
+<SYSTORE>
+  <EXP_ORDINI>
+    <ORD_ORDINE>2</ORD_ORDINE>
+    <ORD_DES />
+    <ORD_TIPOOP>P</ORD_TIPOOP>
+    <EXP_ORDINI_RIGHE>
+      <RIG_ORDINE>2</RIG_ORDINE>
+      <RIG_ARTICOLO>P2</RIG_ARTICOLO>
+      <RIG_SUB1 />
+      <RIG_SUB2 />
+      <RIG_STAMATE />
+      <RIG_TIPOCONF />
+      <RIG_HOSTINF>6</RIG_HOSTINF>
+      <RIG_QTAR>1,000</RIG_QTAR>
+      <RIG_QTAE>1,000</RIG_QTAE>
+      <RIG_REQ_NOTE />
+      <RIG_NOTE_STAMPA />
+      <RIG_HOSTCAUS />
+      <RIG_HOSTRIF />
+    </EXP_ORDINI_RIGHE>
+  </EXP_ORDINI>
+</SYSTORE>
