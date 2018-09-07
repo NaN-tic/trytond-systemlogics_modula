@@ -9,8 +9,7 @@ from trytond.transaction import Transaction
 __all__ = ['Product', 'SystemlogicsModulaArticoli', 'SystemlogicsModulaArticoliResult']
 
 
-class Product:
-    __metaclass__ = PoolMeta
+class Product(metaclass=PoolMeta):
     __name__ = 'product.product'
 
     @classmethod

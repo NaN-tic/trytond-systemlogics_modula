@@ -4,6 +4,6 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
 <data>
     <xpath expr="/form/group[@id=&quot;state_buttons&quot;]/group[@id=&quot;buttons&quot;]/button[@name=&quot;draft&quot;]"
             position="after">
-        <button name="do_systemlogics_modula" string="Modula" icon="tryton-executable"/>
+        <button name="do_systemlogics_modula" icon="tryton-executable"/>
     </xpath>
 </data>

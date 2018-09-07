@@ -234,7 +234,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
         for modula in modulas:
             try:
                 filenames = os.listdir(modula.path)
-            except OSError, e:
+            except OSError:
                 logger.warning('Error reading path: %s' % e)
                 continue
             for filename in filenames:
@@ -248,7 +248,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
                     continue
                 try:
                     content = open(fullname, 'r').read()
-                except IOError, e:
+                except IOError:
                     logger.warning('Error reading file %s: %s' % (fullname, e))
                     continue
                 values['name'] = filename

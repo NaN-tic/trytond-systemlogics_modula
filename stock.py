@@ -11,8 +11,7 @@ __all__ = ['ShipmentIn', 'ShipmentOut', 'ShipmentOutReturn', 'ShipmentInternal',
     'ShipmentOutSystemlogicsModulaExportStart', 'ShipmentOutSystemlogicsModulaExport']
 
 
-class ShipmentIn:
-    __metaclass__ = PoolMeta
+class ShipmentIn(metaclass=PoolMeta):
     __name__ = 'stock.shipment.in'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
@@ -71,8 +70,7 @@ class ShipmentIn:
         cls.generate_systemlogics_modula(shipments)
 
 
-class ShipmentOut:
-    __metaclass__ = PoolMeta
+class ShipmentOut(metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
     systemlogics_modula_completed = fields.Boolean(
@@ -145,8 +143,7 @@ class ShipmentOut:
             cls.generate_systemlogics_modula(shipments)
 
 
-class ShipmentOutReturn:
-    __metaclass__ = PoolMeta
+class ShipmentOutReturn(metaclass=PoolMeta):
     __name__ = 'stock.shipment.out.return'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
@@ -205,8 +202,7 @@ class ShipmentOutReturn:
         cls.generate_systemlogics_modula(shipments)
 
 
-class ShipmentInternal:
-    __metaclass__ = PoolMeta
+class ShipmentInternal(metaclass=PoolMeta):
     __name__ = 'stock.shipment.internal'
     systemlogics_modula = fields.Boolean('SystemLogics Modula')
 
