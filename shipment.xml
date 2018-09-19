@@ -63,6 +63,34 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
+        <!-- user cron shipment out check systemlogics modula -->
+        <record model="res.user" id="user_stock_generate_systemlogics_modula">
+            <field name="login">user_stock_check_systemlogics_modula</field>
+            <field name="name">Cron Check SystemLogics Modula</field>
+            <field name="active" eval="False"/>
+        </record>
+        <record model="res.user-res.group" id="user_stock_check_systemlogics_modula_stock_force_assignment_group">
+            <field name="user" ref="user_stock_check_systemlogics_modula"/>
+            <field name="group" ref="stock.group_stock_force_assignment"/>
+        </record>
+        <record model="res.user-res.group" id="user_stock_check_systemlogics_modula_stock_group">
+            <field name="user" ref="user_stock_check_systemlogics_modula"/>
+            <field name="group" ref="stock.group_stock"/>
+        </record>
+
+        <record model="ir.cron" id="cron_shipment_out_check_systemlogics_modula">
+            <field name="name">Check SystemLogic Modula for Out Shipments</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="user_stock_check_systemlogics_modula"/>
+            <field name="active" eval="True"/>
+            <field name="interval_number" eval="5"/>
+            <field name="interval_type">minuts</field>
+            <field name="number_calls" eval="-1"/>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">stock.shipment.out</field>
+            <field name="function">check_systemlogics_modula_scheduler</field>
+        </record>
+
         <!-- user cron shipment out generate systemlogics modula -->
         <record model="res.user" id="user_stock_generate_systemlogics_modula">
             <field name="login">user_stock_generate_systemlogics_modula</field>

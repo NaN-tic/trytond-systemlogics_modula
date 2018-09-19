@@ -127,9 +127,10 @@ class ShipmentOut:
             shipments, template='IMP_ORDINI_OUT', type_='P')
 
     @classmethod
-    def generate_systemlogics_modula(cls, shipments):
-        '''Generate SystemLogics Modula'''
-        Configuration = Pool().get('stock.configuration')
+    def check_systemlogics_modula(cls, shipments):
+        pool = Pool()
+        ShipmentOut = pool.get('stock.shipment.out')
+        Configuration = pool.get('stock.configuration')
 
         config = Configuration(1)
         if not (Transaction().context.get('generate_systemlogics_modula',
@@ -137,10 +138,8 @@ class ShipmentOut:
             return
 
         to_write = []
-        shipments_modula = []
-        value = {
-    	    'systemlogics_modula': True,
-            'systemlogics_modula_sended': True
+        values = {
+            'systemlogics_modula': True
             }
         for shipment in shipments:
             if hasattr(shipment, 'review'):
@@ -154,13 +153,35 @@ class ShipmentOut:
                 else:
                     completed = False
             if systemLogics:
-                shipments_modula.append(shipment)
                 if completed:
-                    value['systemlogics_modula_completed'] = True
-                    to_write.extend(([shipment], value))
+                    values['systemlogics_modula_completed'] = True
                 else:
-                    value['systemlogics_modula_completed'] = False
-                    to_write.extend(([shipment], value))
+                    values['systemlogics_modula_completed'] = False
+                to_write.extend(([shipment], values))
+        if to_write:
+            ShipmentOut.write(*to_write)
+
+    @classmethod
+    def generate_systemlogics_modula(cls, shipments):
+        '''Generate SystemLogics Modula'''
+        Configuration = Pool().get('stock.configuration')
+
+        config = Configuration(1)
+        if not (Transaction().context.get('generate_systemlogics_modula',
+                config.try_generate_systemlogics_modula)):
+            return
+
+        to_write = []
+        shipments_modula = []
+        value = {
+            'systemlogics_modula_sended': True
+            }
+        for shipment in shipments:
+            if hasattr(shipment, 'review'):
+                if shipment.review:
+                    continue
+                shipments_modula.append(shipment)
+                to_write.extend(([shipment], value))
 
         if shipments_modula:
             cls.write(*to_write)
@@ -170,7 +191,45 @@ class ShipmentOut:
     def assign(cls, shipments):
         super(ShipmentOut, cls).assign(shipments)
         assigned = [s for s in shipments if s.state == 'assigned']
+        cls.check_systemlogics_modula(assigned)
         cls.generate_systemlogics_modula(assigned)
+
+    @classmethod
+    def check_systemlogics_modula_scheduler(cls, args=None):
+        '''
+        This method is intended to be called from ir.cron
+        args: warehouse ids [ids]
+        '''
+        pool = Pool()
+        Configuration = pool.get('stock.configuration')
+        config = Configuration(1)
+
+        domain = [
+            ('state', '=', 'assigned'),
+            ]
+        if args:
+            domain.append(
+                ('warehouse', 'in', args),
+                )
+        shipments = cls.search(domain)
+
+        len_ships = len(shipments)
+        logger.info(
+            'Scheduler Try Check Systemlogics Modula. Total: %s' % (
+                len_ships))
+        if len_ships:
+            blocs = 1
+            slice_systemlogics_modula = (config.slice_systemlogics_modula or
+                len_ships)
+            with Transaction().set_context(generate_systemlogics_modula=True):
+                for sub_shipments in grouped_slice(shipments,
+                        slice_systemlogics_modula):
+                    logger.info('Start bloc %s of %s.' % (
+                            blocs, len_ships/slice_systemlogics_modula))
+                    cls.check_systemlogics_modula(list(sub_shipments))
+                    logger.info('End bloc %s.' % blocs)
+                    blocs += 1
+        logger.info('End Scheduler Try Check Systemlogics Modula.')
 
     @classmethod
     def generate_systemlogics_modula_scheduler(cls, args=None):
@@ -419,5 +478,6 @@ class ShipmentOutSystemlogicsModulaCheck(Wizard):
 
         shipments = list(self.start.shipments)
         if shipments:
-            ShipmentOut.generate_systemlogics_modula(shipments)
+            with Transaction().set_context(generate_systemlogics_modula=True):
+                ShipmentOut.check_systemlogics_modula(shipments)
         return 'end'
