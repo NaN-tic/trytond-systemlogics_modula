@@ -84,7 +84,7 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="user" ref="user_stock_check_systemlogics_modula"/>
             <field name="active" eval="True"/>
             <field name="interval_number" eval="5"/>
-            <field name="interval_type">minuts</field>
+            <field name="interval_type">minutes</field>
             <field name="number_calls" eval="-1"/>
             <field name="repeat_missed" eval="False"/>
             <field name="model">stock.shipment.out</field>
