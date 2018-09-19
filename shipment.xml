@@ -64,7 +64,7 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         </record>
 
         <!-- user cron shipment out check systemlogics modula -->
-        <record model="res.user" id="user_stock_generate_systemlogics_modula">
+        <record model="res.user" id="user_stock_check_systemlogics_modula">
             <field name="login">user_stock_check_systemlogics_modula</field>
             <field name="name">Cron Check SystemLogics Modula</field>
             <field name="active" eval="False"/>
