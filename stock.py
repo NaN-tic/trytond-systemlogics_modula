@@ -129,7 +129,6 @@ class ShipmentOut:
     @classmethod
     def check_systemlogics_modula(cls, shipments):
         pool = Pool()
-        ShipmentOut = pool.get('stock.shipment.out')
         Configuration = pool.get('stock.configuration')
 
         config = Configuration(1)
@@ -153,13 +152,14 @@ class ShipmentOut:
                 else:
                     completed = False
             if systemLogics:
+                values = values.copy()
                 if completed:
                     values['systemlogics_modula_completed'] = True
                 else:
                     values['systemlogics_modula_completed'] = False
                 to_write.extend(([shipment], values))
         if to_write:
-            ShipmentOut.write(*to_write)
+            cls.write(*to_write)
 
     @classmethod
     def generate_systemlogics_modula(cls, shipments):
