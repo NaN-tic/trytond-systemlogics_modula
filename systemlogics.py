@@ -2,7 +2,8 @@
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
 from trytond.pool import Pool
-from trytond.model import ModelView, ModelSQL, fields
+from trytond.model import ModelView, ModelSQL, fields, Unique
+from trytond.wizard import Wizard, StateTransition, StateView, Button
 from trytond.pyson import Eval
 from trytond.transaction import Transaction
 from trytond.rpc import RPC
@@ -16,7 +17,9 @@ import logging
 import datetime
 import tempfile
 
-__all__ = ['SystemLogicsModula', 'SystemLogicsModulaEXPOrdiniFile']
+__all__ = ['SystemLogicsModula', 'SystemLogicsModulaEXPOrdiniFile',
+    'SystemLogicsModulaImportEXPOrdiniFile',
+    'SystemLogicsModulaImportEXPOrdiniFileStart']
 
 loader = genshi.template.TemplateLoader(
     os.path.join(os.path.dirname(__file__), 'template'),
@@ -224,31 +227,25 @@ class SystemLogicsModula(ModelSQL, ModelView):
         EXPOrdiniFile = Pool().get('systemlogics.modula.exp.ordini.file')
 
         logger.info('Start read SystemLogics Module files')
-
-        modulas = cls.search([
-                ('name', '=', 'EXP_ORDINI'),
-                ])
-
         vlist = []
-        to_delete = []
-        for modula in modulas:
+        to_process = []
+        for modula in cls.search([('name', '=', 'EXP_ORDINI')]):
             try:
                 filenames = os.listdir(modula.path)
-            except OSError:
+            except OSError as e:
                 logger.warning('Error reading path: %s' % e)
                 continue
+            exp_ordini_files = [f.name for f in EXPOrdiniFile.search([
+                ('name', 'in', filenames)])]
             for filename in filenames:
                 fullname = '%s/%s' % (modula.path, filename)
                 values = {}
-                exp_ordini_file = EXPOrdiniFile.search([
-                        ('name', '=', filename)
-                        ])
-                if exp_ordini_file:
-                    to_delete.append(fullname)
+                if filename in exp_ordini_files:
+                    to_process.append(fullname)
                     continue
                 try:
                     content = open(fullname, 'r').read()
-                except IOError:
+                except IOError as e:
                     logger.warning('Error reading file %s: %s' % (fullname, e))
                     continue
                 values['name'] = filename
@@ -256,15 +253,18 @@ class SystemLogicsModula(ModelSQL, ModelView):
                 values['content'] = content
                 values['state'] = 'pending'
                 vlist.append(values)
-                to_delete.append(fullname)
+                to_process.append(fullname)
+
         ordini_files = EXPOrdiniFile.create(vlist)
         EXPOrdiniFile.process_export_ordini(ordini_files)
-        for filename in to_delete:
+        Transaction().commit()
+
+        for filename in to_process:
             try:
                 os.remove(filename)
             except OSError:
                 pass
-        logger.info('Loaded SystemLogics Module %s files' % (len(to_delete)))
+        logger.info('Loaded SystemLogics Module %s files' % (len(to_process)))
 
 
 class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
@@ -284,14 +284,15 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(SystemLogicsModulaEXPOrdiniFile, cls).__setup__()
-        cls._sql_constraints += [
-            ('name_uniq', 'UNIQUE(name)', 'Name must be unique.'),
+        t = cls.__table__()
+        cls._sql_constraints = [
+            ('name_uniq', Unique(t, t.name), 'Name must be unique.'),
             ]
         cls._buttons.update({
-                'process_export_ordini': {
-                    'invisible': ~Eval('state').in_(['pending', 'failed']),
-                    },
-                })
+            'process_export_ordini': {
+                'invisible': ~Eval('state').in_(['pending', 'failed']),
+                },
+            })
 
     @classmethod
     def default_state(cls):
@@ -325,20 +326,20 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
                 continue
 
             quantities = {}
-            moves = []
+            move_ids = []
             for o in dom.getElementsByTagName('EXP_ORDINI_RIGHE'):
-                move = {}
-                id_ = (o.getElementsByTagName('RIG_HOSTINF')[0]
-                    .firstChild.data)
-                moves.append(id_)
+                id_ = int(o.getElementsByTagName(
+                    'RIG_HOSTINF')[0].firstChild.data)
+                move_ids.append(id_)
                 quantities[int(id_)] = float(
                     o.getElementsByTagName('RIG_QTAE')
                     [0].firstChild.data.replace(',', '.'))
 
-            moves = Move.search([
-                    ('id', 'in', moves)
-                    ])
-            for move in moves:
+            for move in Move.search([('id', 'in', move_ids)]):
+                # TODO process shipment out and internal
+                if (not move.shipment
+                        or move.shipment.__name__ != 'stock.shipment.out'):
+                    continue
                 if (quantities[move.id] == move.quantity
                         and move.shipment.state == 'assigned'):
                     to_do.append(move)
@@ -368,3 +369,24 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
             cls.write(done_ordini_files, {'state': 'done'})
         if fail_ordini_files:
             cls.write(fail_ordini_files, {'state': 'failed'})
+
+
+class SystemLogicsModulaImportEXPOrdiniFileStart(ModelView):
+    'SystemLogcics Modula Import EXP Ordini File Start'
+    __name__ = 'systemlogics.modula.import.exp.ordini.file.start'
+
+
+class SystemLogicsModulaImportEXPOrdiniFile(Wizard):
+    'SystemLogics Modula Import EXP Ordini File'
+    __name__ = "systemlogics.modula.import.exp.ordini.file"
+    start = StateView('systemlogics.modula.import.exp.ordini.file.start',
+        'systemlogics_modula.systemlogics_modula_import_exp_ordini_file_start', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Import', 'import_', 'tryton-ok', default=True),
+            ])
+    import_ = StateTransition()
+
+    def transition_import_(self):
+        SystemLogicsModula = Pool().get('systemlogics.modula')
+        SystemLogicsModula.export_ordini_file()
+        return 'end'

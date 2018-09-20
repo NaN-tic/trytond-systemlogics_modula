@@ -5,16 +5,19 @@ Systemlogics Modula Scenario
 Imports::
 
     >>> import datetime
+    >>> import os
     >>> from dateutil.relativedelta import relativedelta
     >>> from decimal import Decimal
     >>> from proteus import config, Model, Wizard
     >>> from trytond.tests.tools import activate_modules
     >>> from trytond.modules.company.tests.tools import create_company, \
     ...     get_company
+    >>> from trytond.modules.systemlogics_modula.tests.tools \
+    ...     import read_file
     >>> today = datetime.date.today()
     >>> yesterday = today - relativedelta(days=1)
 
-Install SystemLogics Modula Module::
+Install stock Module::
 
     >>> config = activate_modules('systemlogics_modula')
 
@@ -52,6 +55,10 @@ Create product::
     >>> template.list_price = Decimal('20')
     >>> template.save()
     >>> product, = template.products
+    >>> product.code = 'P1'
+    >>> product.cost_price = Decimal('8')
+    >>> product.code = 'P1'
+    >>> product.save()
 
     >>> product2 = Product()
     >>> template = ProductTemplate()
@@ -62,6 +69,9 @@ Create product::
     >>> template.list_price = Decimal('20')
     >>> template.save()
     >>> product2, = template.products
+    >>> product2.cost_price = Decimal('8')
+    >>> product2.code = 'P2'
+    >>> product2.save()
 
 Get stock locations::
 
@@ -169,13 +179,13 @@ Create Shipment Out::
     >>> shipment_out.systemlogics_modula == False
     True
 
-    >>> shipment_out = ShipmentOut()
-    >>> shipment_out.planned_date = today
-    >>> shipment_out.customer = customer
-    >>> shipment_out.warehouse = warehouse_loc
-    >>> shipment_out.company = company
-    >>> shipment_out.outgoing_moves.extend([StockMove()])
-    >>> for move in shipment_out.outgoing_moves:
+    >>> shipment_out2 = ShipmentOut()
+    >>> shipment_out2.planned_date = today
+    >>> shipment_out2.customer = customer
+    >>> shipment_out2.warehouse = warehouse_loc
+    >>> shipment_out2.company = company
+    >>> shipment_out2.outgoing_moves.extend([StockMove()])
+    >>> for move in shipment_out2.outgoing_moves:
     ...     move.product = product2
     ...     move.uom = unit
     ...     move.quantity = 1
@@ -184,15 +194,15 @@ Create Shipment Out::
     ...     move.company = company
     ...     move.unit_price = Decimal('1')
     ...     move.currency = company.currency
-    >>> shipment_out.save()
-    >>> shipment_out.click('wait')
-    >>> inventory_move, = shipment_out.inventory_moves
+    >>> shipment_out2.save()
+    >>> shipment_out2.click('wait')
+    >>> inventory_move, = shipment_out2.inventory_moves
     >>> inventory_move.from_location = modula_loc
     >>> inventory_move.save()
-    >>> shipment_out.reload()
-    >>> shipment_out.click('assign_try')
+    >>> shipment_out2.reload()
+    >>> shipment_out2.click('assign_try')
     True
-    >>> shipment_out.systemlogics_modula == True
+    >>> shipment_out2.systemlogics_modula == True
     True
 
 Create Shipment Out Return::
@@ -269,4 +279,20 @@ Create Shipment Internal::
     True
     >>> shipment_internal.reload()
     >>> shipment_internal.systemlogics_modula == True
+    True
+
+Import EXP Ordini::
+
+    >>> EXPOrdiniFile = Model.get('systemlogics.modula.exp.ordini.file')
+    >>> ordine_file = os.path.join(os.path.dirname(__file__), 'exp_ordini.xml')
+    >>> exp_ordini_file = EXPOrdiniFile()
+    >>> exp_ordini_file.name = 'EXP_ORDINI1.XML'
+    >>> exp_ordini_file.modula = sm_exp_ordini
+    >>> exp_ordini_file.content = read_file(ordine_file).decode('utf-8')
+    >>> exp_ordini_file.save()
+    >>> exp_ordini_file.click('process_export_ordini')
+    >>> exp_ordini_file.state == 'done'
+    True
+    >>> shipment_out2.reload()
+    >>> shipment_out2.state == 'packed'
     True

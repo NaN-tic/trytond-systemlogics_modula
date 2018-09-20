@@ -162,6 +162,10 @@ msgctxt "model:ir.action,name:wizard_shipment_out_export"
 msgid "Export Systemlogics Modula"
 msgstr "Exportar Systemlogics Modula"
 
+msgctxt "model:ir.action,name:wizard_shipment_out_check"
+msgid "Check Systemlogics Modula"
+msgstr "Comprobar Systemlogics Modula"
+
 msgctxt "model:ir.action,name:wizard_systemlogics_modula_articoli"
 msgid "Export Products Modula"
 msgstr "Exportar productos Modula"
@@ -262,6 +266,10 @@ msgctxt "view:stock.shipment.out.systemlogics.modula.export.start:"
 msgid "Export Shipments Out to Modula"
 msgstr "Exportar albaranes cliente a Modula"
 
+msgctxt "view:stock.shipment.out.systemlogics.modula.check.start:"
+msgid "Check Shipments Out to Modula"
+msgstr "Comprobar albaranes cliente a Modula"
+
 msgctxt "view:systemlogics.modula.articoli.result:"
 msgid "Export Product XML Modula"
 msgstr "Exportar productos XML Modula"
@@ -287,6 +295,11 @@ msgctxt ""
 "wizard_button:stock.shipment.out.systemlogics.modula.export,start,export:"
 msgid "Export"
 msgstr "Exportar"
+
+msgctxt ""
+"wizard_button:stock.shipment.out.systemlogics.modula.check,start,check:"
+msgid "Check"
+msgstr "Comprobar"
 
 msgctxt "wizard_button:systemlogics.modula.articoli,result,end:"
 msgid "Close"
