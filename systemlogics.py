@@ -285,7 +285,7 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
     def __setup__(cls):
         super(SystemLogicsModulaEXPOrdiniFile, cls).__setup__()
         t = cls.__table__()
-        cls._sql_constraints = [
+        cls._sql_constraints += [
             ('name_uniq', Unique(t, t.name), 'Name must be unique.'),
             ]
         cls._buttons.update({
