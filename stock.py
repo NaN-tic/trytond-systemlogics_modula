@@ -204,6 +204,7 @@ class ShipmentOut(metaclass=PoolMeta):
 
         domain = [
             ('state', '=', 'assigned'),
+            ('systemlogics_modula', '=', False),
             ]
         if args:
             domain.append(
@@ -449,6 +450,7 @@ class ShipmentOutSystemlogicsModulaCheckStart(ModelView):
         active_ids = Transaction().context.get('active_ids', [])
         domain = [
             ('state', '=', 'assigned'),
+            ('systemlogics_modula', '=', False),
             ]
         if active_ids:
             domain.append(
