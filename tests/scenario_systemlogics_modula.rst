@@ -216,6 +216,41 @@ Create Shipment Out::
     >>> shipment_out2.systemlogics_modula == True
     True
 
+    >>> shipment_out3 = ShipmentOut()
+    >>> shipment_out3.planned_date = today
+    >>> shipment_out3.customer = customer
+    >>> shipment_out3.warehouse = warehouse_loc
+    >>> shipment_out3.company = company
+
+    >>> move = StockMove()
+    >>> shipment_out3.outgoing_moves.append(move)
+    >>> move.product = product
+    >>> move.uom = unit
+    >>> move.quantity = 1
+    >>> move.from_location = output_loc
+    >>> move.to_location = customer_loc
+    >>> move.company = company
+    >>> move.unit_price = Decimal('1')
+    >>> move.currency = company.currency
+
+    >>> move = StockMove()
+    >>> shipment_out3.outgoing_moves.append(move)
+    >>> move.product = product2
+    >>> move.uom = unit
+    >>> move.quantity = 1
+    >>> move.from_location = output_loc
+    >>> move.to_location = customer_loc
+    >>> move.company = company
+    >>> move.unit_price = Decimal('1')
+    >>> move.currency = company.currency
+
+    >>> shipment_out3.save()
+    >>> shipment_out3.click('wait')
+    >>> shipment_out3.click('assign_try')
+    True
+    >>> shipment_out3.systemlogics_modula == True
+    True
+
 Create Shipment Out Return::
 
     >>> ShipmentOutReturn = Model.get('stock.shipment.out.return')
@@ -301,9 +336,27 @@ Import EXP Ordini::
     >>> exp_ordini_file.modula = sm_exp_ordini
     >>> exp_ordini_file.content = read_file(ordine_file)
     >>> exp_ordini_file.save()
-    >>> exp_ordini_file.click('process_export_ordini')
+    >>> exp_ordini_file.click('process')
     >>> exp_ordini_file.state == 'done'
     True
     >>> shipment_out2.reload()
     >>> shipment_out2.state == 'packed'
+    True
+
+    >>> ordine_file = os.path.join(os.path.dirname(__file__), 'exp_ordini_incomplete.xml')
+    >>> exp_ordini_file = EXPOrdiniFile()
+    >>> exp_ordini_file.name = 'EXP_ORDINI2.XML'
+    >>> exp_ordini_file.modula = sm_exp_ordini
+    >>> exp_ordini_file.content = read_file(ordine_file)
+    >>> exp_ordini_file.save()
+    >>> exp_ordini_file.click('process')
+    >>> exp_ordini_file.state == 'done'
+    True
+    >>> shipment_out3.reload()
+    >>> shipment_out3.state == 'assigned'
+    True
+    >>> m1, m2 = shipment_out3.inventory_moves
+    >>> m1.state == 'assigned'
+    True
+    >>> m2.state == 'done'
     True

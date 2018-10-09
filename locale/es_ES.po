@@ -210,6 +210,10 @@ msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_exp_ordini_file"
 msgid "EXP Ordini Files"
 msgstr "Ficheros EXP Ordini"
 
+msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_exp_ordini_file_process"
+msgid "Process Import EXP Ordini FileEXP Ordini Files"
+msgstr "Procesar ficheros EXP Ordini"
+
 msgctxt "model:ir.ui.menu,name:menu_systemlogics_modula_form"
 msgid "SystemLogics Modula"
 msgstr "SystemLogics Modula"

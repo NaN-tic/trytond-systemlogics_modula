@@ -152,9 +152,28 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="group" ref="group_systemlogics_modula"/>
         </record>
 
+        <!-- Import EXP Ordini File Process -->
+        <record model="ir.ui.view" id="systemlogics_modula_import_exp_ordini_file_process_start">
+            <field name="model">systemlogics.modula.import.exp.ordini.file.process.start</field>
+            <field name="type">form</field>
+            <field name="name">systemlogics_modula_import_exp_ordini_file_process_start</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_systemlogics_modula_import_exp_ordini_file_process_start">
+            <field name="name">Process Import EXP Ordini File</field>
+            <field name="wiz_name">systemlogics.modula.import.exp.ordini.file.process</field>
+        </record>
+        <menuitem id="menu_systemlogics_modula_import_exp_ordini_file_process" parent="menu_systemlogics_modula_exp_ordini_file"
+            action="wizard_systemlogics_modula_import_exp_ordini_file_process_start" name="Process Export Ordini Files"
+            sequence="20"/>
+        <record model="ir.ui.menu-res.group" id="menu_systemlogics_modula_exp_ordini_file_process_group_modula">
+            <field name="menu" ref="menu_systemlogics_modula_import_exp_ordini_file_process"/>
+            <field name="group" ref="group_systemlogics_modula"/>
+        </record>
+
         <!-- CRON for systemlogics.modula -->
         <record model="ir.cron" id="cron_export_ordini_file">
-            <field name="name">Export Ordini Files</field>
+            <field name="name">Export Modula Ordini Files</field>
             <field name="request_user" ref="res.user_admin"/>
             <field name="user" ref="user_systemlogics_modula"/>
             <field name="active" eval="True"/>
@@ -166,16 +185,17 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="function">export_ordini_file</field>
         </record>
 
-        <!-- Trigger for systemlogics.modula -->
-        <record model="ir.trigger" id="trigger_export_ordini_file">
-            <field name="name">SystemLogics Modula EXP Ordini File</field>
+        <record model="ir.cron" id="cron_export_ordini_file_process">
+            <field name="name">Process Modula Export Ordini Files</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="user_systemlogics_modula"/>
             <field name="active" eval="True"/>
-            <field name="model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
-            <field name="on_create" eval="True"/>
-            <field name="condition" eval="[(1, '=', 1)]" pyson="1"/>
-            <field name="limit_number">0</field>
-            <field name="action_model" search="[('model', '=', 'systemlogics.modula.exp.ordini.file')]"/>
-            <field name="action_function">process_export_ordini</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="number_calls">-1</field>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">systemlogics.modula</field>
+            <field name="function">export_ordini_file_process</field>
         </record>
 
         <!-- Access -->
