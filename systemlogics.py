@@ -376,8 +376,6 @@ class SystemLogicsModulaEXPOrdiniFile(ModelSQL, ModelView):
                 to_package.append(shipment)
 
         if to_package:
-            Shipment._sync_inventory_to_outgoing(to_package)
-            Move.assign([m for s in to_package for m in s.outgoing_moves])
             Shipment.pack(to_package)
 
         if done_ordini_files:
