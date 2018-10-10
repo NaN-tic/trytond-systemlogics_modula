@@ -274,7 +274,7 @@ class SystemLogicsModula(ModelSQL, ModelView):
 
         to_process = EXPOrdiniFile.search([('state', '=', 'pending')])
         for process in to_process:
-            EXPOrdiniFile.process(process)
+            EXPOrdiniFile.process([process])
             Transaction().cursor.commit()
 
         logger.info('Loaded SystemLogics Module process'
