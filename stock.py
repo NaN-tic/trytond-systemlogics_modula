@@ -233,6 +233,10 @@ class ShipmentOut:
         logger.info('End Scheduler Try Check Systemlogics Modula.')
 
     @classmethod
+    def generate_systemlogics_modula_scheduler_get_domain(cls):
+        return []
+
+    @classmethod
     def generate_systemlogics_modula_scheduler(cls, args=None):
         '''
         This method is intended to be called from ir.cron
@@ -242,7 +246,9 @@ class ShipmentOut:
         Configuration = pool.get('stock.configuration')
         config = Configuration(1)
 
-        domain = [
+        domain = cls.generate_systemlogics_modula_scheduler_get_domain()
+
+        domain += [
             ('state', '=', 'assigned'),
             ('systemlogics_modula', '=', True),
             ('systemlogics_modula_sended', '=', False),
